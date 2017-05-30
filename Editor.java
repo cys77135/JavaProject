@@ -1,4 +1,14 @@
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FileDialog;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Menu;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
+import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import javax.swing.JButton;
@@ -8,8 +18,10 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.ImageObserver;
-import java.text.AttributedCharacterIterator;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 public class Editor extends JFrame
 {
@@ -26,32 +38,32 @@ public class Editor extends JFrame
     private JLabel xyPos, w_h, attValue, comType, varName;
     private JTextField tfXYPos, tfW_H, tfAttValue, tfVarName;
     private JComboBox cbComType;
-
+    private MyHandler handler;
     public Editor(String title)
     {
         super(title);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(null);
         setSize(1500, 1000);
-
         this.initMenuBar();
         this.initToolBar();
         this.initAttPane();
         this.initEditPane();
         this.addActions();
         this.mySetFont();
-
-
-        //ToolBar 위치 고정
+        
         tb.setFloatable(false);
-
+        
+        
         add(tb);
         add(attPane);
-        add(editPane);
-
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        add(editPane);      
+        
+        
+        
         setVisible(true);
 
-        //Frame 위치 지정
+      
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension frm = this.getSize();
         int xpos = (int) (screen.getWidth() / 2 - frm.getWidth() / 2);
@@ -135,7 +147,7 @@ public class Editor extends JFrame
         xyPos = new JLabel("시작 x,y 좌표   :");
         w_h = new JLabel("    너비, 높이   :");
         attValue = new JLabel("컴포넌트의 텍스트 속성값   :");
-        comType = new JLabel("  컴포넌트 타입   :");
+        comType = new JLabel("  컴포넌트 타입  :");
         varName = new JLabel(" 컴포넌트 변수명   :");
 
         tfXYPos = new JTextField();
@@ -144,12 +156,14 @@ public class Editor extends JFrame
         tfVarName = new JTextField();
 
         String[] types =
-                {
-                        "Rect",
-                        "Circle",
-                        "Oval",
-                        "Arc",
-                        "Polygon"
+                {	
+                        "JPanel",
+                        "JLabel",
+                		"JButton",
+                        "JComboBox",
+                        "JScrollBar",
+                        "JToolBar",
+                        "JMenuBar"     
                 };
 
         cbComType = new JComboBox(types);
@@ -204,17 +218,18 @@ public class Editor extends JFrame
 
     private void initEditPane()
     {
-        //editPane = new JPanel();
         editPane = new MyPanel();
         editPane.setLayout(null);
-        editPane.setBackground(Color.red);
+        editPane.setBackground(Color.WHITE);
         editPane.setSize(this.getWidth() / 3 * 2, this.getHeight());
         editPane.setLocation(attPane.getWidth(), 30);
     }
 
     private void addActions()
     {
-        MyHandler handler = new MyHandler();
+
+        handler = new MyHandler();
+        
         miNew.addActionListener(handler);
         miOpen.addActionListener(handler);
         miSave.addActionListener(handler);
@@ -227,6 +242,7 @@ public class Editor extends JFrame
         mtSaveAs.addActionListener(handler);
         mtMakeJava.addActionListener(handler);
         mtExit.addActionListener(handler);
+        
     }
 
     private void mySetFont()
@@ -250,13 +266,16 @@ public class Editor extends JFrame
         mtSaveAs.setForeground(Color.WHITE);
         mtMakeJava.setForeground(Color.WHITE);
         mtExit.setForeground(Color.WHITE);
+       
     }
 
+    
     public static void main(String[] args)
-    {
+    {	
         Editor mainWin = new Editor("GUI EDITOR");
-    }
-
+    
+    }    
+    
     class MyHandler implements ActionListener
     {
         public void actionPerformed(ActionEvent e)
@@ -292,31 +311,78 @@ public class Editor extends JFrame
                 System.exit(0);
             }
         }
+    }  
+    class MyPanel extends JPanel{
+    	int xPos, yPos, width, height;
+    	MyMouseListener listener = new MyMouseListener();
+    	
+    	
+    	public MyPanel() {
+    		addMouseListener(listener);
+    		xPos = listener.get_onX();
+        	yPos = listener.get_onY();
+        	width = listener.get_offX() - xPos;
+        	height = listener.get_offY() - yPos;
+    	}
+    	
+		
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			g.setColor(Color.BLACK);
+			g.fillRect(xPos, yPos, width, height);
+		}
+	}
+    
+    class MyMouseListener implements MouseListener, MouseMotionListener {
+    	private int onX, onY, offX, offY;
+    	public void mousePressed(MouseEvent e) {
+			onX = e.getX();
+			onY = e.getY();
+		}
+		public void mouseReleased(MouseEvent e) {
+			offX = e.getX();
+			offY = e.getY();
+			
+			if(offX - onX != 0 && offY - onY != 0) {
+			repaint();
+			JPanel panel = new MyPanel();
+			panel.setBackground(Color.BLACK);
+			panel.setSize(offX - onX, offY - onY);
+			panel.setLocation(onX, onY);
+			tfXYPos.setText(panel.getX() + "," + panel.getY());
+			tfW_H.setText(panel.getWidth() + "," + panel.getHeight());
+			editPane.add(panel);
+			}
+		}
+		
+		public int get_onX() {
+			return onX;
+		}
+		
+		public int get_onY() {
+			return onY;
+		}
+		
+		public int get_offX() {
+			return offX;
+		}
+		
+		public int get_offY() {
+			return offY;
+		}
+		
+		public void mouseDragged(MouseEvent me){}
+		public void mouseMoved(MouseEvent me){}
+		public void mouseClicked(MouseEvent me){}
+		public void mouseEntered(MouseEvent me){}
+		public void mouseExited(MouseEvent me){}
     }
 }
 
-class JPanelEX extends JFrame
-{
-    Container contentPane;
-
-    JPanelEX()
-    {
-        setTitle("JPanel paintComponent 예제");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        contentPane = getContentPane();
-        MyPanel panel = new MyPanel();
-        contentPane.add(BorderLayout.CENTER, panel);
-        setSize(250, 200);
-        setVisible(true);
-    }
+class MyModel {
+	private int x;
+	private int y;
+	private int width;
+	private int height;
 }
 
-class MyPanel extends JPanel
-{
-    public void paintComponent(Graphics g)
-    {
-        super.paintComponent(g);
-        g.setColor(Color.BLUE);
-        g.drawRect(20,20, 300, 300);
-    }
-}
