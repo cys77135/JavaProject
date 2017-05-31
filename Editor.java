@@ -319,6 +319,7 @@ public class Editor extends JFrame
     	
     	public MyPanel() {
     		addMouseListener(listener);
+    		addMouseMotionListener(listener);
     		xPos = listener.get_onX();
         	yPos = listener.get_onY();
         	width = listener.get_offX() - xPos;
@@ -344,8 +345,9 @@ public class Editor extends JFrame
 			offY = e.getY();
 			
 			if(offX - onX != 0 && offY - onY != 0) {
+			editPane.remove(editPane.findComponentAt(onX, onY));
 			repaint();
-			JPanel panel = new MyPanel();
+			JPanel panel = new JPanel();
 			panel.setBackground(Color.BLACK);
 			panel.setSize(offX - onX, offY - onY);
 			panel.setLocation(onX, onY);
@@ -371,18 +373,29 @@ public class Editor extends JFrame
 			return offY;
 		}
 		
-		public void mouseDragged(MouseEvent me){}
+		public void mouseDragged(MouseEvent me){
+			int x,y;
+			editPane.remove(editPane.findComponentAt(onX, onY));
+			x=me.getX();
+			y=me.getY();
+			repaint();
+			JPanel panel = new JPanel();
+			panel.setBackground(Color.LIGHT_GRAY);
+			panel.setSize(x- onX, y - onY);
+			panel.setLocation(onX, onY);
+			tfXYPos.setText(panel.getX() + "," + panel.getY());
+			tfW_H.setText(panel.getWidth() + "," + panel.getHeight());
+			editPane.add(panel);
+		}
 		public void mouseMoved(MouseEvent me){}
 		public void mouseClicked(MouseEvent me){}
 		public void mouseEntered(MouseEvent me){}
 		public void mouseExited(MouseEvent me){}
     }
 }
-
 class MyModel {
 	private int x;
 	private int y;
 	private int width;
 	private int height;
 }
-
