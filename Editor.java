@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Font;
@@ -12,7 +13,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -30,7 +30,7 @@ public class Editor extends JFrame
 
     private JToolBar tb;
     private JButton mtNew, mtOpen, mtSave, mtSaveAs, mtMakeJava, mtExit;
-    private JButton pChange;
+    private JButton bChange, bDelete;
 
     private JPanel attPane, editPane;
     private JLabel xyPos, w_h, attValue, comType, varName;
@@ -75,12 +75,12 @@ public class Editor extends JFrame
     {
         mb = new MenuBar();
         mFile = new Menu("Menu");
-        miNew = new MenuItem("ìƒˆë¡œ ë§Œë“¤ê¸°");
-        miOpen = new MenuItem("ì—´ê¸°");
-        miSave = new MenuItem("ì €ì¥");
-        miSaveAs = new MenuItem("ë‹¤ë¥¸ ì´ë¦„ìœ¼ë¡œ ì €ì¥");
-        miMakeJava = new MenuItem(".java íŒŒì¼ ìƒì„±");
-        miExit = new MenuItem("ë‹«ê¸°");
+        miNew = new MenuItem("»õ·Î ¸¸µé±â");
+        miOpen = new MenuItem("¿­±â");
+        miSave = new MenuItem("ÀúÀå");
+        miSaveAs = new MenuItem("´Ù¸¥ ÀÌ¸§À¸·Î ÀúÀå");
+        miMakeJava = new MenuItem(".java ÆÄÀÏ »ı¼º");
+        miExit = new MenuItem("´İ±â");
 
         mFile.add(miNew);
         mFile.add(miOpen);
@@ -104,12 +104,12 @@ public class Editor extends JFrame
         final int B2 = 159;
 
         tb = new JToolBar();
-        mtNew = new JButton("ìƒˆë¡œ ë§Œë“¤ê¸°");
-        mtOpen = new JButton("ì—´ê¸°");
-        mtSave = new JButton("ì €ì¥");
-        mtSaveAs = new JButton("ë‹¤ë¥¸ ì´ë¦„ìœ¼ë¡œ ì €ì¥");
-        mtMakeJava = new JButton(".java íŒŒì¼ ìƒì„±");
-        mtExit = new JButton("ë‹«ê¸°");
+        mtNew = new JButton("»õ·Î ¸¸µé±â");
+        mtOpen = new JButton("¿­±â");
+        mtSave = new JButton("ÀúÀå");
+        mtSaveAs = new JButton("´Ù¸¥ ÀÌ¸§À¸·Î ÀúÀå");
+        mtMakeJava = new JButton(".java ÆÄÀÏ »ı¼º");
+        mtExit = new JButton("´İ±â");
 
         tb.setSize(this.getWidth(), 30);
 
@@ -142,11 +142,11 @@ public class Editor extends JFrame
         attPane.setSize(this.getWidth() / 3, this.getHeight());
         attPane.setLocation(0, 10);
 
-        xyPos = new JLabel("ì‹œì‘ x,y ì¢Œí‘œ   :");
-        w_h = new JLabel("    ë„ˆë¹„, ë†’ì´   :");
-        attValue = new JLabel("ì»´í¬ë„ŒíŠ¸ì˜ í…ìŠ¤íŠ¸ ì†ì„±ê°’   :");
-        comType = new JLabel("  ì»´í¬ë„ŒíŠ¸ íƒ€ì…  :");
-        varName = new JLabel(" ì»´í¬ë„ŒíŠ¸ ë³€ìˆ˜ëª…   :");
+        xyPos = new JLabel("½ÃÀÛ x,y ÁÂÇ¥   :");
+        w_h = new JLabel("    ³Êºñ, ³ôÀÌ   :");
+        attValue = new JLabel("ÄÄÆ÷³ÍÆ®ÀÇ ÅØ½ºÆ® ¼Ó¼º°ª   :");
+        comType = new JLabel("  ÄÄÆ÷³ÍÆ® Å¸ÀÔ  :");
+        varName = new JLabel(" ÄÄÆ÷³ÍÆ® º¯¼ö¸í   :");
 
         tfXYPos = new JTextField();
         tfW_H = new JTextField();
@@ -166,8 +166,9 @@ public class Editor extends JFrame
 
         cbComType = new JComboBox(types);
 
-        pChange = new JButton("ë³€ê²½");
-
+        bChange = new JButton("º¯°æ");
+        bDelete = new JButton("»èÁ¦");
+        
         xyPos.setSize(LB_WIDTH, LB_HEIGHT);
         w_h.setSize(LB_WIDTH, LB_HEIGHT);
         attValue.setSize(LB_WIDTH + 100, LB_HEIGHT);
@@ -181,8 +182,9 @@ public class Editor extends JFrame
 
         cbComType.setSize(TF_WIDTH, TF_HEIGHT);
 
-        pChange.setSize(70, 30);
-
+        bChange.setSize(70, 30);
+        bDelete.setSize(70, 30);
+        
         final int REF_XPOS = 100;
         final int REF_YPOS = 150;
         xyPos.setLocation(REF_XPOS, REF_YPOS);
@@ -199,8 +201,11 @@ public class Editor extends JFrame
 
         cbComType.setLocation(REF_XPOS2, comType.getY());
 
-        pChange.setLocation(REF_XPOS2 + 130, comType.getY() + 230);
-
+        bChange.setLocation(REF_XPOS2 + 30, comType.getY() + 230);
+        bDelete.setLocation(REF_XPOS2 + 130, comType.getY() + 230);
+        
+        bDelete.addActionListener(new MyButtonListener());
+        
         attPane.add(xyPos);
         attPane.add(w_h);
         attPane.add(attValue);
@@ -211,7 +216,8 @@ public class Editor extends JFrame
         attPane.add(tfAttValue);
         attPane.add(tfVarName);
         attPane.add(cbComType);
-        attPane.add(pChange);
+        attPane.add(bChange);
+        attPane.add(bDelete);
     }
 
     private void initEditPane()
@@ -226,7 +232,7 @@ public class Editor extends JFrame
     private void addActions()
     {
 
-        handler = new MyHandler();
+        handler = new MyHandler(this);
 
         miNew.addActionListener(handler);
         miOpen.addActionListener(handler);
@@ -245,8 +251,8 @@ public class Editor extends JFrame
 
     private void mySetFont()
     {
-        Font f = new Font("ë§‘ì€ ê³ ë”•", Font.PLAIN, 13);
-        Font f2 = new Font("ë§‘ì€ ê³ ë”•", Font.BOLD, 13);
+        Font f = new Font("¸¼Àº °íµñ", Font.PLAIN, 13);
+        Font f2 = new Font("¸¼Àº °íµñ", Font.BOLD, 13);
 
         mFile.setFont(f);
         mtNew.setFont(f);
@@ -256,8 +262,9 @@ public class Editor extends JFrame
         mtMakeJava.setFont(f);
         mtExit.setFont(f);
 
-        pChange.setFont(f2);
-
+        bChange.setFont(f2);
+        bDelete.setFont(f2);
+        
         mtNew.setForeground(Color.WHITE);
         mtOpen.setForeground(Color.WHITE);
         mtSave.setForeground(Color.WHITE);
@@ -267,47 +274,13 @@ public class Editor extends JFrame
 
     }
 
-
+    public Container getEditPane() {
+    	return this.editPane;
+    }
+    
     public static void main(String[] args)
     {
         Editor mainWin = new Editor("GUI EDITOR");
-    }
-
-    class MyHandler implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-            String command = e.getActionCommand();
-
-            if (command.equals("ìƒˆë¡œ ë§Œë“¤ê¸°"))
-            {
-                System.exit(0);
-            }
-            else if (command.equals("ì—´ê¸°"))
-            {
-                System.exit(0);
-            }
-            else if (command.equals("ì €ì¥"))
-            {
-                System.exit(0);
-            }
-            else if (command.equals("ë‹¤ë¥¸ ì´ë¦„ìœ¼ë¡œ ì €ì¥"))
-            {
-                FileDialog fileSave =
-                        new FileDialog(Editor.this, "íŒŒì¼ì €ì¥", FileDialog.SAVE);
-                fileSave.setVisible(true);
-                fileName = fileSave.getDirectory() + fileSave.getFile();
-                System.out.println(fileName);
-            }
-            else if (command.equals(".java íŒŒì¼ ìƒì„±"))
-            {
-                System.exit(0);
-            }
-            else if (command.equals("ë‹«ê¸°"))
-            {
-                System.exit(0);
-            }
-        }
     }
 
     class MyPanel extends JPanel
@@ -342,8 +315,6 @@ public class Editor extends JFrame
             onY = e.getY();
             if (isSelected)
             {
-                System.out.println("asd");
-                System.out.println(selX + " " + selY);
                 if (!selected.equals(editPane))
                 {
                     selected.setBackground(Color.LIGHT_GRAY);
@@ -466,30 +437,79 @@ public class Editor extends JFrame
 			}
 			tfXYPos.setText(panel.getX() + "," + panel.getY());
 			tfW_H.setText(panel.getWidth() + "," + panel.getHeight());
-
 			editPane.add(panel);*/
         }
+        
+        public void mouseMoved(MouseEvent me){}
+        public void mouseClicked(MouseEvent me){}
+        public void mouseEntered(MouseEvent me){}
+        public void mouseExited(MouseEvent me) {}
+                     
+    }
+    class MyButtonListener implements ActionListener {
+    	JPanel removePanel;
+    	int removeX, removeY;
+    	public void actionPerformed(ActionEvent e) {
+    		String command = e.getActionCommand();
+    		if(command.equals("»èÁ¦")) {
+    			
+    			String tmp = tfXYPos.getText();
+        		String pos[] = tmp.split(",");
+        		removeX = Integer.parseInt(pos[0]);
+        		removeY = Integer.parseInt(pos[1]);
+        		editPane.remove(editPane.getComponentAt(removeX,removeY));
+        		editPane.repaint();
+    		}
+    	}
+    }
+    
+}
 
-        public void mouseMoved(MouseEvent me)
+class MyHandler implements ActionListener
+{
+	String fileName;
+	Editor editor;
+	
+	public MyHandler(Editor editor) {
+		this.editor = editor;
+	}
+	
+    public void actionPerformed(ActionEvent e)
+    {
+        String command = e.getActionCommand();
+
+        if (command.equals("»õ·Î ¸¸µé±â"))
         {
+            Container newPane = editor.getEditPane();
+            newPane.removeAll();
+            newPane.repaint();
         }
-
-        public void mouseClicked(MouseEvent me)
+        else if (command.equals("¿­±â"))
         {
-            tfAttValue.setText(selX + ", " + selY);
-            tfVarName.setText(me.getX() + ", " + me.getY());
+            System.exit(0);
         }
-
-        public void mouseEntered(MouseEvent me)
+        else if (command.equals("ÀúÀå"))
         {
+            System.exit(0);
         }
-
-        public void mouseExited(MouseEvent me)
+        else if (command.equals("´Ù¸¥ ÀÌ¸§À¸·Î ÀúÀå"))
         {
+            FileDialog fileSave =
+                    new FileDialog(editor, "ÆÄÀÏÀúÀå", FileDialog.SAVE);
+            fileSave.setVisible(true);
+            fileName = fileSave.getDirectory() + fileSave.getFile();
+            System.out.println(fileName);
+        }
+        else if (command.equals(".java ÆÄÀÏ »ı¼º"))
+        {
+            System.exit(0);
+        }
+        else if (command.equals("´İ±â"))
+        {
+            System.exit(0);
         }
     }
 }
-
 class MyModel
 {
     private int x;
