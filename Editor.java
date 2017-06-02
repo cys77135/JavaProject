@@ -1,17 +1,25 @@
-import java.awt.*;
-import javax.swing.JFrame;
-import javax.swing.JToolBar;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FileDialog;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Menu;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
 
 public class Editor extends JFrame
 {
@@ -29,9 +37,7 @@ public class Editor extends JFrame
     private JTextField tfXYPos, tfW_H, tfAttValue, tfVarName;
     private JComboBox cbComType;
     private MyHandler handler;
-
-    private ArrayList<JPanel> jPanels = new ArrayList<JPanel>();
-
+    
     public Editor(String title)
     {
         super(title);
@@ -44,18 +50,19 @@ public class Editor extends JFrame
         this.initEditPane();
         this.addActions();
         this.mySetFont();
-
+        
         tb.setFloatable(false);
-
-
+        
+        
         add(tb);
         add(attPane);
-        add(editPane);
-
-
+        add(editPane);      
+        
+        
+        
         setVisible(true);
 
-
+      
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension frm = this.getSize();
         int xpos = (int) (screen.getWidth() / 2 - frm.getWidth() / 2);
@@ -148,14 +155,14 @@ public class Editor extends JFrame
         tfVarName = new JTextField();
 
         String[] types =
-                {
+                {	
                         "JPanel",
                         "JLabel",
-                        "JButton",
+                		"JButton",
                         "JComboBox",
                         "JScrollBar",
                         "JToolBar",
-                        "JMenuBar"
+                        "JMenuBar"     
                 };
 
         cbComType = new JComboBox(types);
@@ -215,15 +222,13 @@ public class Editor extends JFrame
         editPane.setBackground(Color.WHITE);
         editPane.setSize(this.getWidth() / 3 * 2, this.getHeight());
         editPane.setLocation(attPane.getWidth(), 30);
-        editPane.addMouseListener(new MyMouseListener());
-        editPane.requestFocus();
     }
 
     private void addActions()
     {
 
         handler = new MyHandler();
-
+        
         miNew.addActionListener(handler);
         miOpen.addActionListener(handler);
         miSave.addActionListener(handler);
@@ -236,7 +241,7 @@ public class Editor extends JFrame
         mtSaveAs.addActionListener(handler);
         mtMakeJava.addActionListener(handler);
         mtExit.addActionListener(handler);
-
+        
     }
 
     private void mySetFont()
@@ -260,15 +265,15 @@ public class Editor extends JFrame
         mtSaveAs.setForeground(Color.WHITE);
         mtMakeJava.setForeground(Color.WHITE);
         mtExit.setForeground(Color.WHITE);
-
+       
     }
 
-
+    
     public static void main(String[] args)
-    {
-        new Editor("GUI EDITOR");
-    }
-
+    {	
+        Editor mainWin = new Editor("GUI EDITOR");
+    }    
+    
     class MyHandler implements ActionListener
     {
         public void actionPerformed(ActionEvent e)
@@ -304,158 +309,111 @@ public class Editor extends JFrame
                 System.exit(0);
             }
         }
-    }
-
-    class MyPanel extends JPanel
-    {
-        int xPos, yPos, width, height;
-        MyMouseListener listener = new MyMouseListener();
-
-        public MyPanel()
-        {
-            addMouseListener(listener);
-            addMouseMotionListener(listener);
-            xPos = listener.get_onX();
-            yPos = listener.get_onY();
-            width = listener.get_offX() - xPos;
-            height = listener.get_offY() - yPos;
-        }
-
-
-        public void paintComponent(Graphics g)
-        {
-            super.paintComponent(g);
-            g.setColor(Color.BLACK);
-            g.fillRect(xPos, yPos, width, height);
-        }
-    }
-
-    class MyMouseListener implements MouseListener, MouseMotionListener
-    {
-        private int onX, onY, offX, offY, oWidth, oHeight;
-        JPanel p = null;
-
-        public void mousePressed(MouseEvent e)
-        {
-            onX = e.getX();
-            onY = e.getY();
-            if (e.getSource() != null)
-            {
-                p = (JPanel) e.getSource();
-                oWidth = p.getWidth();
-                oHeight = p.getHeight();
-            }
-        }
-
-        public void mouseReleased(MouseEvent e)
-        {
-            offX = e.getX();
-            offY = e.getY();
-
-            if (offX - onX != 0 && offY - onY != 0 && e.getSource() == editPane)
-            {
-                editPane.remove(editPane.findComponentAt(onX, onY));
-                repaint();
-                JPanel panel = new MyPanel();
-                panel.setBackground(Color.BLACK);
-                panel.setSize(offX - onX, offY - onY);
-                panel.setLocation(onX, onY);
-                tfXYPos.setText(panel.getX() + "," + panel.getY());
-                tfW_H.setText(panel.getWidth() + "," + panel.getHeight());
-                editPane.add(panel);
-                jPanels.add(panel);
-            }
-           /* else if (p != null)
-            {
-                System.out.println("good");
-                repaint();
-                JPanel panel = new MyPanel();
-                panel.setBackground(Color.BLACK);
-                panel.setSize(oWidth, oHeight);
-                panel.setLocation(offX - oWidth / 2, offY - oHeight / 2);
-                tfXYPos.setText(panel.getX() + "," + panel.getY());
-                tfW_H.setText(panel.getWidth() + "," + panel.getHeight());
-                editPane.remove(p);
-                jPanels.remove(p);
-                editPane.add(panel);
-                jPanels.add(panel);
-            }*/
-           // onX = onY = offY = offX = -1;
-            p = null;
-        }
-
-        public int get_onX()
-        {
-            return onX;
-        }
-
-        public int get_onY()
-        {
-            return onY;
-        }
-
-        public int get_offX()
-        {
-            return offX;
-        }
-
-        public int get_offY()
-        {
-            return offY;
-        }
-
-        public void mouseDragged(MouseEvent me)
-        {
-            int x, y;
-            editPane.remove(editPane.findComponentAt(onX, onY));
-            x = me.getX();
-            y = me.getY();
-            repaint();
-            JPanel panel = new MyPanel();
-            panel.setBackground(Color.LIGHT_GRAY);
-            panel.setSize(x - onX, y - onY);
-            panel.setLocation(onX, onY);
-            tfXYPos.setText(panel.getX() + "," + panel.getY());
-            tfW_H.setText(panel.getWidth() + "," + panel.getHeight());
-            editPane.add(panel);
-        }
-
-        public void mouseMoved(MouseEvent me)
-        {
-        }
-
-        public void mouseClicked(MouseEvent me)
-        {
-            JPanel p = (JPanel) me.getSource();
-            for (int i = 0; i < jPanels.size(); i++)
-            {
-                if (p == jPanels.get(i))
-                {
-                    p.setBackground(Color.BLUE);
-                    tfXYPos.setText(p.getX() + ", " + p.getY());
-                    tfW_H.setText(p.getWidth() + ", " + p.getHeight());
-                }
-                else
-                {
-                    jPanels.get(i).setBackground(Color.BLACK);
-                }
-            }
-        }
-
-        public void mouseEntered(MouseEvent me)
-        {
-        }
-
-        public void mouseExited(MouseEvent me)
-        {
-        }
+    }  
+    class MyPanel extends JPanel{
+    	int xPos, yPos, width, height;
+    	MyMouseListener listener = new MyMouseListener();
+    	
+    	public MyPanel() {
+    		addMouseListener(listener);
+    		addMouseMotionListener(listener);
+    	}	
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			g.setColor(Color.BLACK);
+			g.fillRect(xPos, yPos, width, height);
+		}
+	}
+    
+    class MyMouseListener implements MouseListener, MouseMotionListener {
+    	private int onX, onY, offX, offY,selX, selY;
+    	private boolean isSelected;
+    	private JPanel selected;
+    	public void mousePressed(MouseEvent e) {
+    		onX = e.getX();
+			onY = e.getY();
+			if(isSelected){
+				System.out.println("asd");
+				selected = (JPanel)editPane.getComponentAt(selX, selY);
+				System.out.println(selX +" "+ selY);
+				if(!selected.equals(editPane))
+					selected.setBackground(Color.LIGHT_GRAY);
+			}
+			selected = (JPanel)editPane.getComponentAt(onX, onY);
+		
+			//	before.setBackground(Color.YELLOW);
+			if(!selected.equals(editPane)){
+				selected.setBackground(Color.blue);
+				selX=onX; selY=onY;
+				isSelected=true;
+			}
+			else{
+				isSelected=false;
+			}
+		}
+		public void mouseReleased(MouseEvent e) {
+			offX = e.getX();
+			offY = e.getY();
+			repaint();
+			if(isSelected){
+				editPane.remove(selected);	
+				selected.setSize(selected.getWidth(), selected.getHeight());
+				selected.setLocation(selected.getX()+(offX-onX), selected.getY()+(offY-onY));
+				selected.setBackground(Color.blue);
+				tfXYPos.setText(selected.getX() + "," + selected.getY());
+				tfW_H.setText(selected.getWidth() + "," + selected.getHeight());
+				selX=offX; selY=offY;
+				editPane.add(selected);
+			}
+			else{
+				JPanel panel = new JPanel();
+				panel.setBackground(Color.LIGHT_GRAY);
+				panel.setSize(offX - onX, offY - onY);
+				panel.setLocation(onX, onY);
+				tfXYPos.setText(panel.getX() + "," + panel.getY());
+				tfW_H.setText(panel.getWidth() + "," + panel.getHeight());
+				editPane.add(panel);
+			}
+		}
+		
+		public void mouseDragged(MouseEvent me){
+			/*int x,y;
+			x=me.getX();
+			y=me.getY();
+			repaint();
+			JPanel panel = new JPanel();
+			editPane.remove(editPane.getComponentAt(x, y));
+			if(isSelected){
+				panel.setBackground(Color.yellow);
+				panel.setSize(selected.getWidth(), selected.getHeight());
+				panel.setLocation(selected.getX()+(x-onX), selected.getY()+(y-onY));
+			}
+			else{
+				panel.setBackground(Color.YELLOW);
+				panel.setSize(x- onX, y - onY);
+				panel.setLocation(onX, onY);
+			}
+			tfXYPos.setText(panel.getX() + "," + panel.getY());
+			tfW_H.setText(panel.getWidth() + "," + panel.getHeight());	
+			
+			editPane.add(panel);*/
+		}
+		public void mouseMoved(MouseEvent me){}
+		public void mouseClicked(MouseEvent me){}
+		public void mouseEntered(MouseEvent me){}
+		public void mouseExited(MouseEvent me){}
     }
 }
-
-class MyModel
-{
-    private int x;
-    private int y;
-    private int width;
-    private int height;
+class MyModel {
+	private int x;
+	private int y;
+	private int width;
+	private int height;
+	private String attValue;
+	private String varName;
+	private String comType;
+	public MyModel(int x, int y,int width, int height){
+		this.x = x; this.y = y; this.width = width; this.height = height;
+	}
 }
+
