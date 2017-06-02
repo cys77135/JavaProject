@@ -37,7 +37,7 @@ public class Editor extends JFrame
     private JTextField tfXYPos, tfW_H, tfAttValue, tfVarName;
     private JComboBox cbComType;
     private MyHandler handler;
-    
+
     public Editor(String title)
     {
         super(title);
@@ -50,19 +50,18 @@ public class Editor extends JFrame
         this.initEditPane();
         this.addActions();
         this.mySetFont();
-        
+
         tb.setFloatable(false);
-        
-        
+
+
         add(tb);
         add(attPane);
-        add(editPane);      
-        
-        
-        
+        add(editPane);
+
+
         setVisible(true);
 
-      
+
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension frm = this.getSize();
         int xpos = (int) (screen.getWidth() / 2 - frm.getWidth() / 2);
@@ -155,14 +154,14 @@ public class Editor extends JFrame
         tfVarName = new JTextField();
 
         String[] types =
-                {	
+                {
                         "JPanel",
                         "JLabel",
-                		"JButton",
+                        "JButton",
                         "JComboBox",
                         "JScrollBar",
                         "JToolBar",
-                        "JMenuBar"     
+                        "JMenuBar"
                 };
 
         cbComType = new JComboBox(types);
@@ -228,7 +227,7 @@ public class Editor extends JFrame
     {
 
         handler = new MyHandler();
-        
+
         miNew.addActionListener(handler);
         miOpen.addActionListener(handler);
         miSave.addActionListener(handler);
@@ -241,7 +240,7 @@ public class Editor extends JFrame
         mtSaveAs.addActionListener(handler);
         mtMakeJava.addActionListener(handler);
         mtExit.addActionListener(handler);
-        
+
     }
 
     private void mySetFont()
@@ -265,15 +264,15 @@ public class Editor extends JFrame
         mtSaveAs.setForeground(Color.WHITE);
         mtMakeJava.setForeground(Color.WHITE);
         mtExit.setForeground(Color.WHITE);
-       
+
     }
 
-    
+
     public static void main(String[] args)
-    {	
+    {
         Editor mainWin = new Editor("GUI EDITOR");
-    }    
-    
+    }
+
     class MyHandler implements ActionListener
     {
         public void actionPerformed(ActionEvent e)
@@ -309,76 +308,148 @@ public class Editor extends JFrame
                 System.exit(0);
             }
         }
-    }  
-    class MyPanel extends JPanel{
-    	int xPos, yPos, width, height;
-    	MyMouseListener listener = new MyMouseListener();
-    	
-    	public MyPanel() {
-    		addMouseListener(listener);
-    		addMouseMotionListener(listener);
-    	}	
-		public void paintComponent(Graphics g) {
-			super.paintComponent(g);
-			g.setColor(Color.BLACK);
-			g.fillRect(xPos, yPos, width, height);
-		}
-	}
-    
-    class MyMouseListener implements MouseListener, MouseMotionListener {
-    	private int onX, onY, offX, offY,selX, selY;
-    	private boolean isSelected;
-    	private JPanel selected;
-    	public void mousePressed(MouseEvent e) {
-    		onX = e.getX();
-			onY = e.getY();
-			if(isSelected){
-				System.out.println("asd");
-				selected = (JPanel)editPane.getComponentAt(selX, selY);
-				System.out.println(selX +" "+ selY);
-				if(!selected.equals(editPane))
-					selected.setBackground(Color.LIGHT_GRAY);
-			}
-			selected = (JPanel)editPane.getComponentAt(onX, onY);
-		
-			//	before.setBackground(Color.YELLOW);
-			if(!selected.equals(editPane)){
-				selected.setBackground(Color.blue);
-				selX=onX; selY=onY;
-				isSelected=true;
-			}
-			else{
-				isSelected=false;
-			}
-		}
-		public void mouseReleased(MouseEvent e) {
-			offX = e.getX();
-			offY = e.getY();
-			repaint();
-			if(isSelected){
-				editPane.remove(selected);	
-				selected.setSize(selected.getWidth(), selected.getHeight());
-				selected.setLocation(selected.getX()+(offX-onX), selected.getY()+(offY-onY));
-				selected.setBackground(Color.blue);
-				tfXYPos.setText(selected.getX() + "," + selected.getY());
-				tfW_H.setText(selected.getWidth() + "," + selected.getHeight());
-				selX=offX; selY=offY;
-				editPane.add(selected);
-			}
-			else{
-				JPanel panel = new JPanel();
-				panel.setBackground(Color.LIGHT_GRAY);
-				panel.setSize(offX - onX, offY - onY);
-				panel.setLocation(onX, onY);
-				tfXYPos.setText(panel.getX() + "," + panel.getY());
-				tfW_H.setText(panel.getWidth() + "," + panel.getHeight());
-				editPane.add(panel);
-			}
-		}
-		
-		public void mouseDragged(MouseEvent me){
-			/*int x,y;
-			x=me.getX();
+    }
+
+    class MyPanel extends JPanel
+    {
+        int xPos, yPos, width, height;
+        MyMouseListener listener = new MyMouseListener();
+
+        public MyPanel()
+        {
+            addMouseListener(listener);
+            addMouseMotionListener(listener);
+        }
+
+        public void paintComponent(Graphics g)
+        {
+            super.paintComponent(g);
+            g.setColor(Color.BLACK);
+            g.fillRect(xPos, yPos, width, height);
+        }
+    }
+
+    class MyMouseListener implements MouseListener, MouseMotionListener
+    {
+        private int onX, onY, offX, offY, selX, selY;
+        private boolean isSelected, isSized;
+        private int xCk = 0, yCk = 0;
+        private JPanel selected;
+
+        public void mousePressed(MouseEvent e)
+        {
+            onX = e.getX();
+            onY = e.getY();
+            if (isSelected)
+            {
+                System.out.println("asd");
+                System.out.println(selX + " " + selY);
+                if (!selected.equals(editPane))
+                {
+                    selected.setBackground(Color.LIGHT_GRAY);
+                    if (onX >= selected.getX() + selected.getWidth() - 10 && onX <= selected.getX() + selected.getWidth())
+                    {
+                        isSized = true;
+                        xCk = 1;
+                    }
+                    else if (onX >= selected.getX() && onX <= selected.getX() + 10)
+                    {
+                        isSized = true;
+                        xCk = -1;
+                    }
+                    if (onY >= selected.getY() + selected.getHeight() - 10 && onY <= selected.getY() + selected.getHeight())
+                    {
+                        isSized = true;
+                        yCk = 1;
+                    }
+                    else if (onY >= selected.getY() && onY <= selected.getY() + 10)
+                    {
+                        isSized = true;
+                        yCk = -1;
+                    }
+                }
+            }
+            selected = (JPanel) editPane.getComponentAt(onX, onY);
+
+            if (!selected.equals(editPane))
+            {
+                selected.setBackground(Color.blue);
+                selX = onX;
+                selY = onY;
+                isSelected = true;
+            }
+            else
+            {
+                isSelected = false;
+            }
+        }
+
+        public void mouseReleased(MouseEvent e)
+        {
+            offX = e.getX();
+            offY = e.getY();
+            repaint();
+            if (isSelected)
+            {
+                if (isSized)
+                {
+                    editPane.remove(selected);
+                    if (xCk > 0)
+                    {
+                        selected.setSize(e.getX() - selected.getX(), selected.getHeight());
+                        selected.setLocation(selected.getX(), selected.getY());
+                    }
+                    else if (xCk < 0)
+                    {
+                        selected.setSize(selected.getX() + selected.getWidth() - e.getX(), selected.getHeight());
+                        selected.setLocation(e.getX(), selected.getY());
+                    }
+                    if (yCk > 0)
+                    {
+                        selected.setSize(selected.getWidth(), e.getY() - selected.getY());
+                        selected.setLocation(selected.getX(), selected.getY());
+                    }
+                    else if (yCk < 0)
+                    {
+                        selected.setSize(selected.getWidth(), selected.getY() + selected.getHeight() - e.getY());
+                        selected.setLocation(selected.getX(), e.getY());
+                    }
+                    selected.setBackground(Color.blue);
+                    tfXYPos.setText(selected.getX() + "," + selected.getY());
+                    tfW_H.setText(selected.getWidth() + "," + selected.getHeight());
+                    editPane.add(selected);
+                }
+                else
+                {
+                    editPane.remove(selected);
+                    selected.setSize(selected.getWidth(), selected.getHeight());
+                    selected.setLocation(selected.getX() + (offX - onX), selected.getY() + (offY - onY));
+                    selected.setBackground(Color.blue);
+                    tfXYPos.setText(selected.getX() + "," + selected.getY());
+                    tfW_H.setText(selected.getWidth() + "," + selected.getHeight());
+                    selX = offX;
+                    selY = offY;
+                    editPane.add(selected);
+                }
+            }
+            else
+            {
+                JPanel panel = new JPanel();
+                panel.setBackground(Color.LIGHT_GRAY);
+                panel.setSize(offX - onX, offY - onY);
+                panel.setLocation(onX, onY);
+                tfXYPos.setText(panel.getX() + "," + panel.getY());
+                tfW_H.setText(panel.getWidth() + "," + panel.getHeight());
+                editPane.add(panel);
+            }
+            xCk = yCk = 0;
+            isSized = false;
+        }
+
+        public void mouseDragged(MouseEvent me)
+        {
+            /*int x,y;
+            x=me.getX();
 			y=me.getY();
 			repaint();
 			JPanel panel = new JPanel();
@@ -394,26 +465,46 @@ public class Editor extends JFrame
 				panel.setLocation(onX, onY);
 			}
 			tfXYPos.setText(panel.getX() + "," + panel.getY());
-			tfW_H.setText(panel.getWidth() + "," + panel.getHeight());	
-			
+			tfW_H.setText(panel.getWidth() + "," + panel.getHeight());
+
 			editPane.add(panel);*/
-		}
-		public void mouseMoved(MouseEvent me){}
-		public void mouseClicked(MouseEvent me){}
-		public void mouseEntered(MouseEvent me){}
-		public void mouseExited(MouseEvent me){}
+        }
+
+        public void mouseMoved(MouseEvent me)
+        {
+        }
+
+        public void mouseClicked(MouseEvent me)
+        {
+            tfAttValue.setText(selX + ", " + selY);
+            tfVarName.setText(me.getX() + ", " + me.getY());
+        }
+
+        public void mouseEntered(MouseEvent me)
+        {
+        }
+
+        public void mouseExited(MouseEvent me)
+        {
+        }
     }
 }
-class MyModel {
-	private int x;
-	private int y;
-	private int width;
-	private int height;
-	private String attValue;
-	private String varName;
-	private String comType;
-	public MyModel(int x, int y,int width, int height){
-		this.x = x; this.y = y; this.width = width; this.height = height;
-	}
-}
 
+class MyModel
+{
+    private int x;
+    private int y;
+    private int width;
+    private int height;
+    private String attValue;
+    private String varName;
+    private String comType;
+
+    public MyModel(int x, int y, int width, int height)
+    {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+}
