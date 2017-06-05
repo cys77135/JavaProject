@@ -71,7 +71,6 @@ public class Editor extends JFrame
 		this.setResizable(false);
 
 		myModelList = new MyArrayList();
-		System.out.println(myModelList.size());
 	}
 	private void initMenuBar()
 	{
@@ -306,7 +305,7 @@ public class Editor extends JFrame
 		}
 	}
 	class MyMouseListener implements MouseListener, MouseMotionListener {
-		private int onX, onY, offX, offY,beforeX, beforeY;
+		private int onX, onY, offX, offY, beforeX, beforeY;
 		private boolean isSelected, isSized;
 		private int xCk = 0, yCk = 0;
 		public void mousePressed(MouseEvent e) {
@@ -360,6 +359,8 @@ public class Editor extends JFrame
 				if(!selected.equals(editPane)){
 					selected.setBackground(Color.blue);
 				}
+				JPanel panel = editPane.searchPanel(onX, onY);
+				myModelList.remove(panel.getX(),panel.getY());
 				MyModel newMyModel = new MyModel(selected.getX(),selected.getY(),selected.getWidth(),selected.getHeight());
 				myModelList.add(newMyModel);
 				beforeX=selected.getX()+selected.getWidth()/2;
@@ -367,12 +368,10 @@ public class Editor extends JFrame
 			}
 			else{ //처음 그려질 때
 				if(offX-onX>0 && offY-onY>0){
-					System.out.println("new");
 					editPane.removePanel(onX, onY);
 					JPanel panel = editPane.addPanel(onX,onY, offX - onX, offY - onY,Color.LIGHT_GRAY);
 					MyModel newMyModel = new MyModel(panel.getX(),panel.getY(),panel.getWidth(),panel.getHeight());
 					myModelList.add(newMyModel);
-					System.out.println(myModelList.size());
 				}
 			}
 			xCk = yCk = 0;
@@ -381,6 +380,7 @@ public class Editor extends JFrame
 		public void mouseDragged(MouseEvent me){
 			editPane.removePanel(onX, onY);
 			if(isSelected){
+				myModelList.remove(selected.getX(),selected.getY());
 				if (isSized)
 				{	
 					int beforeX=selected.getX(), beforeY=selected.getY();
@@ -427,12 +427,11 @@ public class Editor extends JFrame
 		public void actionPerformed(ActionEvent e) {
 			String command = e.getActionCommand();
 			if(command.equals("삭제")) {
-				editPane.removePanel(selected.getX(),selected.getY());
-				editPane.repaint();
 				myModelList.remove(selected.getX(), selected.getY());
 				if(myModelList.isEmpty())
 					System.out.println("this is empty.");
-				System.out.println(myModelList.size());
+				editPane.removePanel(selected.getX(),selected.getY());
+				editPane.repaint();
 			}
 		}
 	}
@@ -501,14 +500,16 @@ class MyModel
 
 	public int getX(){ return x; }
 	public int getY(){ return y; }
+	public int getwidth(){ return width; }
 }
 class MyArrayList extends ArrayList<MyModel>{
 	public boolean remove(int x,int y){
 		int i;
 		for(i=0; i<this.size(); i++){
 			MyModel tmp = this.get(i);
-			if(tmp.getX()==x && tmp.getY()==y)
+			if(tmp.getX()==x && tmp.getY() == y)
 				break;
+
 		}
 		if(i==this.size())
 			return false;
