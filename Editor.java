@@ -444,29 +444,43 @@ public class Editor extends JFrame
 	}
 	
 	class MyJSON extends JSONObject {
+		String fileName;
 		JSONObject jObj = new JSONObject();
 		Iterator<MyModel> it = myModelList.iterator();
 		public MyJSON() {
-		while(it.hasNext()) {
-			MyModel tmp = (MyModel)it.next();
-			jObj.put("x", tmp.getX() + "");
-			jObj.put("y", tmp.getY() + "");
-			jObj.put("width", tmp.getWidth() + "");
-			jObj.put("height", tmp.getHeight() + "");
-			jObj.put("attValue", tmp.getAttValue() + "");
-			jObj.put("varName", tmp.getVarName() + "");
-			jObj.put("comType", tmp.getComType() + "");
+			fileName = "d:\\MyJSON.json";	
 		}
 		
-		try {
-			FileWriter file = new FileWriter("d:\\MyJSON.json");
-			file.write(jObj.toJSONString());
-			file.flush();
-			file.close();
-		} catch(IOException e) {
-			e.printStackTrace();
+		public MyJSON(String fileName) {
+			this.fileName = fileName + ".json";
 		}
-		System.out.println("Create JSON Object : " + jObj);
+		
+		public void makeFile() {
+			while(it.hasNext()) {
+				MyModel tmp = (MyModel)it.next();
+			
+				if(tmp.getAttValue() != null && tmp.getVarName() != null && tmp.getComType() != null) {
+					jObj.put("x", tmp.getX() + "");
+					jObj.put("y", tmp.getY() + "");
+					jObj.put("width", tmp.getWidth() + "");
+					jObj.put("height", tmp.getHeight() + "");
+					jObj.put("attValue", tmp.getAttValue() + "");
+					jObj.put("varName", tmp.getVarName() + "");
+					jObj.put("comType", tmp.getComType() + "");
+				}
+				else {
+					System.out.println("잘못된 저장입니다.");
+					return;
+				}	
+			}
+			try {
+				FileWriter file = new FileWriter(fileName);
+				file.write(jObj.toJSONString());
+				file.flush();
+				file.close();
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }
@@ -493,7 +507,7 @@ class MyHandler implements ActionListener
 		}
 		else if (command.equals("저장"))
 		{
-			editor.new MyJSON();
+			editor.new MyJSON().makeFile();
 		}
 		else if (command.equals("다른 이름으로 저장"))
 		{
@@ -501,6 +515,7 @@ class MyHandler implements ActionListener
 					new FileDialog(editor, "파일저장", FileDialog.SAVE);
 			fileSave.setVisible(true);
 			fileName = fileSave.getDirectory() + fileSave.getFile();
+			editor.new MyJSON(fileName).makeFile();
 			System.out.println(fileName);
 		}
 		else if (command.equals(".java 파일 생성"))
@@ -543,8 +558,6 @@ class MyModel
 	public String getVarName() {return varName;}
 	public String getComType() {return comType;}
 }
-
-
 
 class MyArrayList extends ArrayList<MyModel>{
 	public boolean remove(int x,int y){
