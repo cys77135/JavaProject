@@ -3,7 +3,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
@@ -13,6 +12,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.HashMap;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -23,508 +24,477 @@ import javax.swing.JToolBar;
 
 public class Editor extends JFrame
 {
-    private String fileName;
-    private MenuBar mb;
-    private Menu mFile;
-    private MenuItem miNew, miOpen, miSave, miSaveAs, miMakeJava, miExit;
+	private String fileName;
+	private MenuBar mb;
+	private Menu mFile;
+	private MenuItem miNew, miOpen, miSave, miSaveAs, miMakeJava, miExit;
 
-    private JToolBar tb;
-    private JButton mtNew, mtOpen, mtSave, mtSaveAs, mtMakeJava, mtExit;
-    private JButton bChange, bDelete;
+	private JToolBar tb;
+	private JButton mtNew, mtOpen, mtSave, mtSaveAs, mtMakeJava, mtExit;
+	private JButton bChange, bDelete;
 
-    private JPanel attPane, editPane;
-    private JLabel xyPos, w_h, attValue, comType, varName;
-    private JTextField tfXYPos, tfW_H, tfAttValue, tfVarName;
-    private JComboBox cbComType;
-    private MyHandler handler;
+	private JPanel attPane, selected;
+	private MyPanel editPane;
+	private JLabel xyPos, w_h, attValue, comType, varName;
+	private JTextField tfXYPos, tfW_H, tfAttValue, tfVarName;
+	private JComboBox cbComType;
+	private MyHandler handler;
+	
+	private HashMap<JPanel,MyModel> myModelList;
+	
+	public Editor(String title)
+	{
+		super(title);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setLayout(null);
+		setSize(1500, 1000);
+		this.initMenuBar();
+		this.initToolBar();
+		this.initAttPane();
+		this.initEditPane();
+		this.addActions();
+		this.mySetFont();
 
-    public Editor(String title)
-    {
-        super(title);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(null);
-        setSize(1500, 1000);
-        this.initMenuBar();
-        this.initToolBar();
-        this.initAttPane();
-        this.initEditPane();
-        this.addActions();
-        this.mySetFont();
+		tb.setFloatable(false);
 
-        tb.setFloatable(false);
+		add(tb);
+		add(attPane);
+		add(editPane);
 
+		setVisible(true);
 
-        add(tb);
-        add(attPane);
-        add(editPane);
+		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension frm = this.getSize();
+		int xpos = (int) (screen.getWidth() / 2 - frm.getWidth() / 2);
+		int ypos = (int) (screen.getHeight() / 2 - frm.getHeight() / 2 - 20);
+		this.setLocation(xpos, ypos);
+		this.setResizable(false);
+		
+		myModelList = new HashMap<JPanel,MyModel>();
+	}
+	private void initMenuBar()
+	{
+		mb = new MenuBar();
+		mFile = new Menu("Menu");
+		miNew = new MenuItem("ìƒˆë¡œ ë§Œë“¤ê¸°");
+		miOpen = new MenuItem("ì—´ê¸°");
+		miSave = new MenuItem("ì €ìž¥");
+		miSaveAs = new MenuItem("ë‹¤ë¥¸ ì´ë¦„ìœ¼ë¡œ ì €ìž¥");
+		miMakeJava = new MenuItem(".java íŒŒì¼ ìƒì„±");
+		miExit = new MenuItem("ë‹«ê¸°");
 
+		mFile.add(miNew);
+		mFile.add(miOpen);
+		mFile.add(miSave);
+		mFile.add(miSaveAs);
+		mFile.add(miMakeJava);
+		mFile.addSeparator();
+		mFile.add(miExit);
 
-        setVisible(true);
+		mb.add(mFile);
+		setMenuBar(mb);
+	}
+	private void initToolBar()
+	{
+		final int R = 23;
+		final int G = 89;
+		final int B = 149;
+		final int R2 = 37;
+		final int G2 = 104;
+		final int B2 = 159;
 
+		tb = new JToolBar();
+		mtNew = new JButton("ìƒˆë¡œ ë§Œë“¤ê¸°");
+		mtOpen = new JButton("ì—´ê¸°");
+		mtSave = new JButton("ì €ìž¥");
+		mtSaveAs = new JButton("ë‹¤ë¥¸ ì´ë¦„ìœ¼ë¡œ ì €ìž¥");
+		mtMakeJava = new JButton(".java íŒŒì¼ ìƒì„±");
+		mtExit = new JButton("ë‹«ê¸°");
 
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension frm = this.getSize();
-        int xpos = (int) (screen.getWidth() / 2 - frm.getWidth() / 2);
-        int ypos = (int) (screen.getHeight() / 2 - frm.getHeight() / 2 - 20);
-        this.setLocation(xpos, ypos);
-        this.setResizable(false);
+		tb.setSize(this.getWidth(), 30);
 
-    }
+		tb.setBackground(new Color(R, G, B));
+		mtNew.setBackground(new Color(R2, G2, B2));
+		mtOpen.setBackground(new Color(R2, G2, B2));
+		mtSave.setBackground(new Color(R2, G2, B2));
+		mtSaveAs.setBackground(new Color(R2, G2, B2));
+		mtMakeJava.setBackground(new Color(R2, G2, B2));
+		mtExit.setBackground(new Color(R2, G2, B2));
 
-    private void initMenuBar()
-    {
-        mb = new MenuBar();
-        mFile = new Menu("Menu");
-        miNew = new MenuItem("»õ·Î ¸¸µé±â");
-        miOpen = new MenuItem("¿­±â");
-        miSave = new MenuItem("ÀúÀå");
-        miSaveAs = new MenuItem("´Ù¸¥ ÀÌ¸§À¸·Î ÀúÀå");
-        miMakeJava = new MenuItem(".java ÆÄÀÏ »ý¼º");
-        miExit = new MenuItem("´Ý±â");
+		tb.add(mtNew);
+		tb.add(mtOpen);
+		tb.add(mtSave);
+		tb.add(mtSaveAs);
+		tb.add(mtMakeJava);
+		tb.add(mtExit);
+	}
+	private void initAttPane()
+	{
+		final int LB_WIDTH = 100;
+		final int LB_HEIGHT = 30;
+		final int TF_WIDTH = 200;
+		final int TF_HEIGHT = 30;
 
-        mFile.add(miNew);
-        mFile.add(miOpen);
-        mFile.add(miSave);
-        mFile.add(miSaveAs);
-        mFile.add(miMakeJava);
-        mFile.addSeparator();
-        mFile.add(miExit);
+		attPane = new JPanel();
+		attPane.setLayout(null);
+		attPane.setBackground(new Color(225, 225, 225));
+		attPane.setSize(this.getWidth() / 3, this.getHeight());
+		attPane.setLocation(0, 10);
 
-        mb.add(mFile);
-        setMenuBar(mb);
-    }
+		xyPos = new JLabel("ì‹œìž‘ x,y ì¢Œí‘œ   :");
+		w_h = new JLabel("    ë„ˆë¹„, ë†’ì´   :");
+		attValue = new JLabel("ì»´í¬ë„ŒíŠ¸ì˜ í…ìŠ¤íŠ¸ ì†ì„±ê°’   :");
+		comType = new JLabel("  ì»´í¬ë„ŒíŠ¸ íƒ€ìž…  :");
+		varName = new JLabel(" ì»´í¬ë„ŒíŠ¸ ë³€ìˆ˜ëª…   :");
 
-    private void initToolBar()
-    {
-        final int R = 23;
-        final int G = 89;
-        final int B = 149;
-        final int R2 = 37;
-        final int G2 = 104;
-        final int B2 = 159;
+		tfXYPos = new JTextField();
+		tfW_H = new JTextField();
+		tfAttValue = new JTextField();
+		tfVarName = new JTextField();
 
-        tb = new JToolBar();
-        mtNew = new JButton("»õ·Î ¸¸µé±â");
-        mtOpen = new JButton("¿­±â");
-        mtSave = new JButton("ÀúÀå");
-        mtSaveAs = new JButton("´Ù¸¥ ÀÌ¸§À¸·Î ÀúÀå");
-        mtMakeJava = new JButton(".java ÆÄÀÏ »ý¼º");
-        mtExit = new JButton("´Ý±â");
+		String[] types =
+			{
+					"JPanel",
+					"JLabel",
+					"JButton",
+					"JComboBox",
+					"JScrollBar",
+					"JToolBar",
+					"JMenuBar"
+			};
 
-        tb.setSize(this.getWidth(), 30);
+		cbComType = new JComboBox(types);
 
-        tb.setBackground(new Color(R, G, B));
-        mtNew.setBackground(new Color(R2, G2, B2));
-        mtOpen.setBackground(new Color(R2, G2, B2));
-        mtSave.setBackground(new Color(R2, G2, B2));
-        mtSaveAs.setBackground(new Color(R2, G2, B2));
-        mtMakeJava.setBackground(new Color(R2, G2, B2));
-        mtExit.setBackground(new Color(R2, G2, B2));
+		bChange = new JButton("ë³€ê²½");
+		bDelete = new JButton("ì‚­ì œ");
 
-        tb.add(mtNew);
-        tb.add(mtOpen);
-        tb.add(mtSave);
-        tb.add(mtSaveAs);
-        tb.add(mtMakeJava);
-        tb.add(mtExit);
-    }
+		xyPos.setSize(LB_WIDTH, LB_HEIGHT);
+		w_h.setSize(LB_WIDTH, LB_HEIGHT);
+		attValue.setSize(LB_WIDTH + 100, LB_HEIGHT);
+		comType.setSize(LB_WIDTH, LB_HEIGHT);
+		varName.setSize(LB_WIDTH + 100, LB_HEIGHT);
 
-    private void initAttPane()
-    {
-        final int LB_WIDTH = 100;
-        final int LB_HEIGHT = 30;
-        final int TF_WIDTH = 200;
-        final int TF_HEIGHT = 30;
+		tfXYPos.setSize(TF_WIDTH, TF_HEIGHT);
+		tfW_H.setSize(TF_WIDTH, TF_HEIGHT);
+		tfAttValue.setSize(TF_WIDTH, TF_HEIGHT);
+		tfVarName.setSize(TF_WIDTH, TF_HEIGHT);
 
-        attPane = new JPanel();
-        attPane.setLayout(null);
-        attPane.setBackground(new Color(225, 225, 225));
-        attPane.setSize(this.getWidth() / 3, this.getHeight());
-        attPane.setLocation(0, 10);
+		cbComType.setSize(TF_WIDTH, TF_HEIGHT);
 
-        xyPos = new JLabel("½ÃÀÛ x,y ÁÂÇ¥   :");
-        w_h = new JLabel("    ³Êºñ, ³ôÀÌ   :");
-        attValue = new JLabel("ÄÄÆ÷³ÍÆ®ÀÇ ÅØ½ºÆ® ¼Ó¼º°ª   :");
-        comType = new JLabel("  ÄÄÆ÷³ÍÆ® Å¸ÀÔ  :");
-        varName = new JLabel(" ÄÄÆ÷³ÍÆ® º¯¼ö¸í   :");
+		bChange.setSize(70, 30);
+		bDelete.setSize(70, 30);
 
-        tfXYPos = new JTextField();
-        tfW_H = new JTextField();
-        tfAttValue = new JTextField();
-        tfVarName = new JTextField();
+		final int REF_XPOS = 100;
+		final int REF_YPOS = 150;
+		xyPos.setLocation(REF_XPOS, REF_YPOS);
+		w_h.setLocation(REF_XPOS, xyPos.getY() + 130);
+		attValue.setLocation(REF_XPOS - 80, w_h.getY() + 130);
+		comType.setLocation(REF_XPOS - 20, attValue.getY() + 130);
+		varName.setLocation(REF_XPOS - 30, comType.getY() + 130);
 
-        String[] types =
-                {
-                        "JPanel",
-                        "JLabel",
-                        "JButton",
-                        "JComboBox",
-                        "JScrollBar",
-                        "JToolBar",
-                        "JMenuBar"
-                };
+		final int REF_XPOS2 = REF_XPOS + 100;
+		tfXYPos.setLocation(REF_XPOS2, xyPos.getY());
+		tfW_H.setLocation(REF_XPOS2, w_h.getY());
+		tfAttValue.setLocation(REF_XPOS2, attValue.getY());
+		tfVarName.setLocation(REF_XPOS2, varName.getY());
 
-        cbComType = new JComboBox(types);
+		cbComType.setLocation(REF_XPOS2, comType.getY());
 
-        bChange = new JButton("º¯°æ");
-        bDelete = new JButton("»èÁ¦");
-        
-        xyPos.setSize(LB_WIDTH, LB_HEIGHT);
-        w_h.setSize(LB_WIDTH, LB_HEIGHT);
-        attValue.setSize(LB_WIDTH + 100, LB_HEIGHT);
-        comType.setSize(LB_WIDTH, LB_HEIGHT);
-        varName.setSize(LB_WIDTH + 100, LB_HEIGHT);
+		bChange.setLocation(REF_XPOS2 + 30, comType.getY() + 230);
+		bDelete.setLocation(REF_XPOS2 + 130, comType.getY() + 230);
 
-        tfXYPos.setSize(TF_WIDTH, TF_HEIGHT);
-        tfW_H.setSize(TF_WIDTH, TF_HEIGHT);
-        tfAttValue.setSize(TF_WIDTH, TF_HEIGHT);
-        tfVarName.setSize(TF_WIDTH, TF_HEIGHT);
+		bDelete.addActionListener(new MyButtonListener());
 
-        cbComType.setSize(TF_WIDTH, TF_HEIGHT);
+		attPane.add(xyPos);
+		attPane.add(w_h);
+		attPane.add(attValue);
+		attPane.add(comType);
+		attPane.add(varName);
+		attPane.add(tfXYPos);
+		attPane.add(tfW_H);
+		attPane.add(tfAttValue);
+		attPane.add(tfVarName);
+		attPane.add(cbComType);
+		attPane.add(bChange);
+		attPane.add(bDelete);
+	}
+	private void initEditPane()
+	{
+		editPane = new MyPanel();
+		editPane.setLayout(null);
+		editPane.setBackground(Color.WHITE);
+		editPane.setSize(this.getWidth() / 3 * 2, this.getHeight());
+		editPane.setLocation(attPane.getWidth(), 30);
+	}
+	private void addActions()
+	{
 
-        bChange.setSize(70, 30);
-        bDelete.setSize(70, 30);
-        
-        final int REF_XPOS = 100;
-        final int REF_YPOS = 150;
-        xyPos.setLocation(REF_XPOS, REF_YPOS);
-        w_h.setLocation(REF_XPOS, xyPos.getY() + 130);
-        attValue.setLocation(REF_XPOS - 80, w_h.getY() + 130);
-        comType.setLocation(REF_XPOS - 20, attValue.getY() + 130);
-        varName.setLocation(REF_XPOS - 30, comType.getY() + 130);
+		handler = new MyHandler(this);
 
-        final int REF_XPOS2 = REF_XPOS + 100;
-        tfXYPos.setLocation(REF_XPOS2, xyPos.getY());
-        tfW_H.setLocation(REF_XPOS2, w_h.getY());
-        tfAttValue.setLocation(REF_XPOS2, attValue.getY());
-        tfVarName.setLocation(REF_XPOS2, varName.getY());
+		miNew.addActionListener(handler);
+		miOpen.addActionListener(handler);
+		miSave.addActionListener(handler);
+		miSaveAs.addActionListener(handler);
+		miMakeJava.addActionListener(handler);
+		miExit.addActionListener(handler);
+		mtNew.addActionListener(handler);
+		mtOpen.addActionListener(handler);
+		mtSave.addActionListener(handler);
+		mtSaveAs.addActionListener(handler);
+		mtMakeJava.addActionListener(handler);
+		mtExit.addActionListener(handler);
 
-        cbComType.setLocation(REF_XPOS2, comType.getY());
+	}
+	private void mySetFont()
+	{
+		Font f = new Font("ë§‘ì€ ê³ ë”•", Font.PLAIN, 13);
+		Font f2 = new Font("ë§‘ì€ ê³ ë”•", Font.BOLD, 13);
 
-        bChange.setLocation(REF_XPOS2 + 30, comType.getY() + 230);
-        bDelete.setLocation(REF_XPOS2 + 130, comType.getY() + 230);
-        
-        bDelete.addActionListener(new MyButtonListener());
-        
-        attPane.add(xyPos);
-        attPane.add(w_h);
-        attPane.add(attValue);
-        attPane.add(comType);
-        attPane.add(varName);
-        attPane.add(tfXYPos);
-        attPane.add(tfW_H);
-        attPane.add(tfAttValue);
-        attPane.add(tfVarName);
-        attPane.add(cbComType);
-        attPane.add(bChange);
-        attPane.add(bDelete);
-    }
+		mFile.setFont(f);
+		mtNew.setFont(f);
+		mtOpen.setFont(f);
+		mtSave.setFont(f);
+		mtSaveAs.setFont(f);
+		mtMakeJava.setFont(f);
+		mtExit.setFont(f);
 
-    private void initEditPane()
-    {
-        editPane = new MyPanel();
-        editPane.setLayout(null);
-        editPane.setBackground(Color.WHITE);
-        editPane.setSize(this.getWidth() / 3 * 2, this.getHeight());
-        editPane.setLocation(attPane.getWidth(), 30);
-    }
+		bChange.setFont(f2);
+		bDelete.setFont(f2);
 
-    private void addActions()
-    {
+		mtNew.setForeground(Color.WHITE);
+		mtOpen.setForeground(Color.WHITE);
+		mtSave.setForeground(Color.WHITE);
+		mtSaveAs.setForeground(Color.WHITE);
+		mtMakeJava.setForeground(Color.WHITE);
+		mtExit.setForeground(Color.WHITE);
 
-        handler = new MyHandler(this);
+	}
+	public Container getEditPane() {
+		return this.editPane;
+	}
+	public static void main(String[] args)
+	{
+		Editor mainWin = new Editor("GUI EDITOR");
+	}
+	class MyPanel extends JPanel{
+		int xPos, yPos, width, height;
+		MyMouseListener listener = new MyMouseListener();
 
-        miNew.addActionListener(handler);
-        miOpen.addActionListener(handler);
-        miSave.addActionListener(handler);
-        miSaveAs.addActionListener(handler);
-        miMakeJava.addActionListener(handler);
-        miExit.addActionListener(handler);
-        mtNew.addActionListener(handler);
-        mtOpen.addActionListener(handler);
-        mtSave.addActionListener(handler);
-        mtSaveAs.addActionListener(handler);
-        mtMakeJava.addActionListener(handler);
-        mtExit.addActionListener(handler);
-
-    }
-
-    private void mySetFont()
-    {
-        Font f = new Font("¸¼Àº °íµñ", Font.PLAIN, 13);
-        Font f2 = new Font("¸¼Àº °íµñ", Font.BOLD, 13);
-
-        mFile.setFont(f);
-        mtNew.setFont(f);
-        mtOpen.setFont(f);
-        mtSave.setFont(f);
-        mtSaveAs.setFont(f);
-        mtMakeJava.setFont(f);
-        mtExit.setFont(f);
-
-        bChange.setFont(f2);
-        bDelete.setFont(f2);
-        
-        mtNew.setForeground(Color.WHITE);
-        mtOpen.setForeground(Color.WHITE);
-        mtSave.setForeground(Color.WHITE);
-        mtSaveAs.setForeground(Color.WHITE);
-        mtMakeJava.setForeground(Color.WHITE);
-        mtExit.setForeground(Color.WHITE);
-
-    }
-
-    public Container getEditPane() {
-    	return this.editPane;
-    }
-    
-    public static void main(String[] args)
-    {
-        Editor mainWin = new Editor("GUI EDITOR");
-    }
-
-    class MyPanel extends JPanel
-    {
-        int xPos, yPos, width, height;
-        MyMouseListener listener = new MyMouseListener();
-
-        public MyPanel()
-        {
-            addMouseListener(listener);
-            addMouseMotionListener(listener);
-        }
-
-        public void paintComponent(Graphics g)
-        {
-            super.paintComponent(g);
-            g.setColor(Color.BLACK);
-            g.fillRect(xPos, yPos, width, height);
-        }
-    }
-
-    class MyMouseListener implements MouseListener, MouseMotionListener
-    {
-        private int onX, onY, offX, offY, selX, selY;
-        private boolean isSelected, isSized;
-        private int xCk = 0, yCk = 0;
-        private JPanel selected;
-
-        public void mousePressed(MouseEvent e)
-        {
-            onX = e.getX();
-            onY = e.getY();
-            if (isSelected)
-            {
-                if (!selected.equals(editPane))
-                {
-                    selected.setBackground(Color.LIGHT_GRAY);
-                    if (onX >= selected.getX() + selected.getWidth() - 10 && onX <= selected.getX() + selected.getWidth())
-                    {
-                        isSized = true;
-                        xCk = 1;
-                    }
-                    else if (onX >= selected.getX() && onX <= selected.getX() + 10)
-                    {
-                        isSized = true;
-                        xCk = -1;
-                    }
-                    if (onY >= selected.getY() + selected.getHeight() - 10 && onY <= selected.getY() + selected.getHeight())
-                    {
-                        isSized = true;
-                        yCk = 1;
-                    }
-                    else if (onY >= selected.getY() && onY <= selected.getY() + 10)
-                    {
-                        isSized = true;
-                        yCk = -1;
-                    }
-                }
-            }
-            selected = (JPanel) editPane.getComponentAt(onX, onY);
-
-            if (!selected.equals(editPane))
-            {
-                selected.setBackground(Color.blue);
-                selX = onX;
-                selY = onY;
-                isSelected = true;
-            }
-            else
-            {
-                isSelected = false;
-            }
-        }
-
-        public void mouseReleased(MouseEvent e)
-        {
-            offX = e.getX();
-            offY = e.getY();
-            repaint();
-            if (isSelected)
-            {
-                if (isSized)
-                {
-                    editPane.remove(selected);
-                    if (xCk > 0)
-                    {
-                        selected.setSize(e.getX() - selected.getX(), selected.getHeight());
-                        selected.setLocation(selected.getX(), selected.getY());
-                    }
-                    else if (xCk < 0)
-                    {
-                        selected.setSize(selected.getX() + selected.getWidth() - e.getX(), selected.getHeight());
-                        selected.setLocation(e.getX(), selected.getY());
-                    }
-                    if (yCk > 0)
-                    {
-                        selected.setSize(selected.getWidth(), e.getY() - selected.getY());
-                        selected.setLocation(selected.getX(), selected.getY());
-                    }
-                    else if (yCk < 0)
-                    {
-                        selected.setSize(selected.getWidth(), selected.getY() + selected.getHeight() - e.getY());
-                        selected.setLocation(selected.getX(), e.getY());
-                    }
-                    selected.setBackground(Color.blue);
-                    tfXYPos.setText(selected.getX() + "," + selected.getY());
-                    tfW_H.setText(selected.getWidth() + "," + selected.getHeight());
-                    editPane.add(selected);
-                }
-                else
-                {
-                    editPane.remove(selected);
-                    selected.setSize(selected.getWidth(), selected.getHeight());
-                    selected.setLocation(selected.getX() + (offX - onX), selected.getY() + (offY - onY));
-                    selected.setBackground(Color.blue);
-                    tfXYPos.setText(selected.getX() + "," + selected.getY());
-                    tfW_H.setText(selected.getWidth() + "," + selected.getHeight());
-                    selX = offX;
-                    selY = offY;
-                    editPane.add(selected);
-                }
-            }
-            else
-            {
-                JPanel panel = new JPanel();
-                panel.setBackground(Color.LIGHT_GRAY);
-                panel.setSize(offX - onX, offY - onY);
-                panel.setLocation(onX, onY);
-                tfXYPos.setText(panel.getX() + "," + panel.getY());
-                tfW_H.setText(panel.getWidth() + "," + panel.getHeight());
-                editPane.add(panel);
-            }
-            xCk = yCk = 0;
-            isSized = false;
-        }
-
-        public void mouseDragged(MouseEvent me)
-        {
-            /*int x,y;
-            x=me.getX();
-			y=me.getY();
+		public MyPanel() {
+			addMouseListener(listener);
+			addMouseMotionListener(listener);
+		}	
+		public JPanel addPanel(int x, int y, int width, int height, Color color){
 			repaint();
 			JPanel panel = new JPanel();
-			editPane.remove(editPane.getComponentAt(x, y));
-			if(isSelected){
-				panel.setBackground(Color.yellow);
-				panel.setSize(selected.getWidth(), selected.getHeight());
-				panel.setLocation(selected.getX()+(x-onX), selected.getY()+(y-onY));
-			}
-			else{
-				panel.setBackground(Color.YELLOW);
-				panel.setSize(x- onX, y - onY);
-				panel.setLocation(onX, onY);
-			}
+			panel.setBackground(color);
+			panel.setSize(width, height);
+			panel.setLocation(x, y);
 			tfXYPos.setText(panel.getX() + "," + panel.getY());
 			tfW_H.setText(panel.getWidth() + "," + panel.getHeight());
-			editPane.add(panel);*/
-        }
-        
-        public void mouseMoved(MouseEvent me){}
-        public void mouseClicked(MouseEvent me){}
-        public void mouseEntered(MouseEvent me){}
-        public void mouseExited(MouseEvent me) {}
-                     
-    }
-    class MyButtonListener implements ActionListener {
-    	JPanel removePanel;
-    	int removeX, removeY;
-    	public void actionPerformed(ActionEvent e) {
-    		String command = e.getActionCommand();
-    		if(command.equals("»èÁ¦")) {
-    			
-    			String tmp = tfXYPos.getText();
-        		String pos[] = tmp.split(",");
-        		removeX = Integer.parseInt(pos[0]);
-        		removeY = Integer.parseInt(pos[1]);
-        		editPane.remove(editPane.getComponentAt(removeX,removeY));
-        		editPane.repaint();
-    		}
-    	}
-    }
-    
-}
+			add(panel);
+			return panel;
+		}
+		public JPanel searchPanel(int x,int y){
+			JPanel panel = (JPanel)this.getComponentAt(x, y);
+			return panel;
+		}
+		public void removePanel(int x,int y){
+			JPanel target = this.searchPanel(x, y);
+			this.remove(target);
+		}
+	}
+	class MyMouseListener implements MouseListener, MouseMotionListener {
+		private int onX, onY, offX, offY,beforeX, beforeY;
+		private boolean isSelected, isSized;
+		private int xCk = 0, yCk = 0;
+		public void mousePressed(MouseEvent e) {
+			onX = e.getX();
+			onY = e.getY();
+			if(isSelected){ 
+				if (!selected.equals(editPane)){
+					if (onX >= selected.getX() + selected.getWidth() - 15 && onX <= selected.getX() + selected.getWidth())
+					{
+						isSized = true;
+						xCk = 1;
+					}
+					else if (onX >= selected.getX() && onX <= selected.getX() + 15)
+					{
+						isSized = true;
+						xCk = -1;
+					}
+					if (onY >= selected.getY() + selected.getHeight() - 15 && onY <= selected.getY() + selected.getHeight())
+					{
+						isSized = true;
+						yCk = 1;
+					}
+					else if (onY >= selected.getY() && onY <= selected.getY() + 15)
+					{
+						isSized = true;
+						yCk = -1;
+					}
+				}
+				if(!selected.equals(editPane))
+					selected.setBackground(Color.LIGHT_GRAY);
+			}
+			selected = editPane.searchPanel(onX,onY);
 
+			if(!selected.equals(editPane)){
+				selected.setBackground(Color.blue);
+				MyModel selectedMyModel = myModelList.get(selected);
+				tfXYPos.setText(selectedMyModel.getX() + "," + selected.getY());
+				tfW_H.setText(selected.getWidth() + "," + selected.getHeight());
+				beforeX=onX; beforeY=onY;
+				isSelected=true;
+			}
+			else{
+				isSelected=false;
+			}
+		}
+		public void mouseReleased(MouseEvent e) {
+			offX = e.getX();
+			offY = e.getY();
+			if(isSelected){ //ì˜®ê¸°ê¸° & í¬ê¸°ë³€ê²½
+				if(!isSized)
+					selected = editPane.searchPanel(offX, offY);
+				if(!selected.equals(editPane)){
+					selected.setBackground(Color.blue);
+				}
+				
+				beforeX=selected.getX()+selected.getWidth()/2;
+				beforeY=selected.getY()+selected.getHeight()/2;
+			}
+			else{ //ì²˜ìŒ ê·¸ë ¤ì§ˆ ë•Œ
+				if(offX-onX>0 && offY-onY>0){
+				editPane.removePanel(onX, onY);
+				JPanel newPanel = editPane.addPanel(onX,onY, offX - onX, offY - onY,Color.LIGHT_GRAY);
+				MyModel newModel = new MyModel(newPanel.getX(),newPanel.getY(),newPanel.getWidth(),newPanel.getHeight());
+				System.out.println(newPanel.getX());
+				myModelList.put(newPanel, newModel);
+				}
+			}
+			xCk = yCk = 0;
+			isSized = false;
+		}
+		public void mouseDragged(MouseEvent me){
+			editPane.removePanel(onX, onY);
+			if(isSelected){
+				if (isSized)
+				{	
+					int beforeX=selected.getX(), beforeY=selected.getY();
+					int beforeWidth=selected.getWidth(), beforeHeight = selected.getHeight();
+					editPane.removePanel(me.getX(),me.getY());
+					if (xCk > 0)
+					{
+						selected = editPane.addPanel(beforeX, beforeY, me.getX() - beforeX, beforeHeight, Color.YELLOW);
+					}
+					else if (xCk < 0)
+					{
+						selected = editPane.addPanel(me.getX(), beforeY, beforeWidth + (beforeX - me.getX()), beforeHeight, Color.YELLOW);
+					}
+					if (yCk > 0)
+					{
+						selected = editPane.addPanel(beforeX, beforeY, beforeWidth, me.getY()-beforeY, Color.yellow);
+					}
+					else if (yCk < 0)
+					{
+						selected = editPane.addPanel(beforeX, me.getY(), beforeWidth, beforeHeight + (beforeY - me.getY()), Color.yellow);
+					}
+				}
+				else{
+					JPanel before_panel = editPane.searchPanel(me.getX(), me.getY());
+					editPane.addPanel(selected.getX()+(me.getX()-onX), selected.getY()+(me.getY()-onY),selected.getWidth(),selected.getHeight(), Color.yellow);
+					if(!before_panel.equals(editPane)){
+						editPane.removePanel(me.getX(), me.getY());
+					}
+				}
+			}
+			else{
+				editPane.removePanel(onX, onY);
+				editPane.addPanel(onX, onY, me.getX()-onX, me.getY()-onY, Color.yellow);
+			}
+		}
+		public void mouseMoved(MouseEvent me){}
+		public void mouseClicked(MouseEvent me){}
+		public void mouseEntered(MouseEvent me){}
+		public void mouseExited(MouseEvent me){}
+	}
+	class MyButtonListener implements ActionListener {
+		JPanel removePanel;
+		int removeX, removeY;
+		public void actionPerformed(ActionEvent e) {
+			String command = e.getActionCommand();
+			if(command.equals("ì‚­ì œ")) {
+				editPane.remove(selected);
+				editPane.repaint();
+				myModelList.remove(selected);
+				if(myModelList.isEmpty())
+					System.out.println("aSD");
+			}
+		}
+	}
+}
 class MyHandler implements ActionListener
 {
 	String fileName;
 	Editor editor;
-	
+
 	public MyHandler(Editor editor) {
 		this.editor = editor;
 	}
-	
-    public void actionPerformed(ActionEvent e)
-    {
-        String command = e.getActionCommand();
+	public void actionPerformed(ActionEvent e)
+	{
+		String command = e.getActionCommand();
 
-        if (command.equals("»õ·Î ¸¸µé±â"))
-        {
-            Container newPane = editor.getEditPane();
-            newPane.removeAll();
-            newPane.repaint();
-        }
-        else if (command.equals("¿­±â"))
-        {
-            System.exit(0);
-        }
-        else if (command.equals("ÀúÀå"))
-        {
-            System.exit(0);
-        }
-        else if (command.equals("´Ù¸¥ ÀÌ¸§À¸·Î ÀúÀå"))
-        {
-            FileDialog fileSave =
-                    new FileDialog(editor, "ÆÄÀÏÀúÀå", FileDialog.SAVE);
-            fileSave.setVisible(true);
-            fileName = fileSave.getDirectory() + fileSave.getFile();
-            System.out.println(fileName);
-        }
-        else if (command.equals(".java ÆÄÀÏ »ý¼º"))
-        {
-            System.exit(0);
-        }
-        else if (command.equals("´Ý±â"))
-        {
-            System.exit(0);
-        }
-    }
+		if (command.equals("ìƒˆë¡œ ë§Œë“¤ê¸°"))
+		{
+			Container newPane = editor.getEditPane();
+			newPane.removeAll();
+			newPane.repaint();
+		}
+		else if (command.equals("ì—´ê¸°"))
+		{
+			System.exit(0);
+		}
+		else if (command.equals("ì €ìž¥"))
+		{
+			System.exit(0);
+		}
+		else if (command.equals("ë‹¤ë¥¸ ì´ë¦„ìœ¼ë¡œ ì €ìž¥"))
+		{
+			FileDialog fileSave =
+					new FileDialog(editor, "íŒŒì¼ì €ìž¥", FileDialog.SAVE);
+			fileSave.setVisible(true);
+			fileName = fileSave.getDirectory() + fileSave.getFile();
+			System.out.println(fileName);
+		}
+		else if (command.equals(".java íŒŒì¼ ìƒì„±"))
+		{
+			System.exit(0);
+		}
+		else if (command.equals("ë‹«ê¸°"))
+		{
+			System.exit(0);
+		}
+	}
 }
 class MyModel
 {
-    private int x;
-    private int y;
-    private int width;
-    private int height;
-    private String attValue;
-    private String varName;
-    private String comType;
+	private int x;
+	private int y;
+	private int width;
+	private int height;
+	private String attValue;
+	private String varName;
+	private String comType;
 
-    public MyModel(int x, int y, int width, int height)
-    {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
+	public MyModel(int x, int y, int width, int height)
+	{
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	}
+	
+	public int getX(){ return x;}
 }
