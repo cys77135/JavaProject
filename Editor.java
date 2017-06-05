@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -39,9 +39,9 @@ public class Editor extends JFrame
 	private JTextField tfXYPos, tfW_H, tfAttValue, tfVarName;
 	private JComboBox cbComType;
 	private MyHandler handler;
-	
-	private HashMap<JPanel,MyModel> myModelList;
-	
+
+	private MyArrayList myModelList;
+
 	public Editor(String title)
 	{
 		super(title);
@@ -69,8 +69,9 @@ public class Editor extends JFrame
 		int ypos = (int) (screen.getHeight() / 2 - frm.getHeight() / 2 - 20);
 		this.setLocation(xpos, ypos);
 		this.setResizable(false);
-		
-		myModelList = new HashMap<JPanel,MyModel>();
+
+		myModelList = new MyArrayList();
+		System.out.println(myModelList.size());
 	}
 	private void initMenuBar()
 	{
@@ -341,8 +342,7 @@ public class Editor extends JFrame
 
 			if(!selected.equals(editPane)){
 				selected.setBackground(Color.blue);
-				MyModel selectedMyModel = myModelList.get(selected);
-				tfXYPos.setText(selectedMyModel.getX() + "," + selected.getY());
+				tfXYPos.setText(selected.getX() + "," + selected.getY());
 				tfW_H.setText(selected.getWidth() + "," + selected.getHeight());
 				beforeX=onX; beforeY=onY;
 				isSelected=true;
@@ -360,17 +360,19 @@ public class Editor extends JFrame
 				if(!selected.equals(editPane)){
 					selected.setBackground(Color.blue);
 				}
-				
+				MyModel newMyModel = new MyModel(selected.getX(),selected.getY(),selected.getWidth(),selected.getHeight());
+				myModelList.add(newMyModel);
 				beforeX=selected.getX()+selected.getWidth()/2;
 				beforeY=selected.getY()+selected.getHeight()/2;
 			}
 			else{ //처음 그려질 때
 				if(offX-onX>0 && offY-onY>0){
-				editPane.removePanel(onX, onY);
-				JPanel newPanel = editPane.addPanel(onX,onY, offX - onX, offY - onY,Color.LIGHT_GRAY);
-				MyModel newModel = new MyModel(newPanel.getX(),newPanel.getY(),newPanel.getWidth(),newPanel.getHeight());
-				System.out.println(newPanel.getX());
-				myModelList.put(newPanel, newModel);
+					System.out.println("new");
+					editPane.removePanel(onX, onY);
+					JPanel panel = editPane.addPanel(onX,onY, offX - onX, offY - onY,Color.LIGHT_GRAY);
+					MyModel newMyModel = new MyModel(panel.getX(),panel.getY(),panel.getWidth(),panel.getHeight());
+					myModelList.add(newMyModel);
+					System.out.println(myModelList.size());
 				}
 			}
 			xCk = yCk = 0;
@@ -425,11 +427,12 @@ public class Editor extends JFrame
 		public void actionPerformed(ActionEvent e) {
 			String command = e.getActionCommand();
 			if(command.equals("삭제")) {
-				editPane.remove(selected);
+				editPane.removePanel(selected.getX(),selected.getY());
 				editPane.repaint();
-				myModelList.remove(selected);
+				myModelList.remove(selected.getX(), selected.getY());
 				if(myModelList.isEmpty())
-					System.out.println("aSD");
+					System.out.println("this is empty.");
+				System.out.println(myModelList.size());
 			}
 		}
 	}
@@ -495,6 +498,23 @@ class MyModel
 		this.width = width;
 		this.height = height;
 	}
-	
-	public int getX(){ return x;}
+
+	public int getX(){ return x; }
+	public int getY(){ return y; }
+}
+class MyArrayList extends ArrayList<MyModel>{
+	public boolean remove(int x,int y){
+		int i;
+		for(i=0; i<this.size(); i++){
+			MyModel tmp = this.get(i);
+			if(tmp.getX()==x && tmp.getY()==y)
+				break;
+		}
+		if(i==this.size())
+			return false;
+		else{
+			this.remove(i);
+			return true;
+		}
+	}
 }
