@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
-import org.json.simple.JSONObject;
+//import org.json.simple.JSONObject;
 
 public class Editor extends JFrame
 {
@@ -81,12 +81,12 @@ public class Editor extends JFrame
 	{
 		mb = new MenuBar();
 		mFile = new Menu("Menu");
-		miNew = new MenuItem("»õ·Î ¸¸µé±â");
-		miOpen = new MenuItem("¿­±â");
-		miSave = new MenuItem("ÀúÀå");
-		miSaveAs = new MenuItem("´Ù¸¥ ÀÌ¸§À¸·Î ÀúÀå");
-		miMakeJava = new MenuItem(".java ÆÄÀÏ »ı¼º");
-		miExit = new MenuItem("´İ±â");
+		miNew = new MenuItem("ìƒˆë¡œ ë§Œë“¤ê¸°");
+		miOpen = new MenuItem("ì—´ê¸°");
+		miSave = new MenuItem("ì €ì¥");
+		miSaveAs = new MenuItem("ë‹¤ë¥¸ ì´ë¦„ìœ¼ë¡œ ì €ì¥");
+		miMakeJava = new MenuItem(".java íŒŒì¼ ìƒì„±");
+		miExit = new MenuItem("ë‹«ê¸°");
 
 		mFile.add(miNew);
 		mFile.add(miOpen);
@@ -109,12 +109,12 @@ public class Editor extends JFrame
 		final int B2 = 159;
 
 		tb = new JToolBar();
-		mtNew = new JButton("»õ·Î ¸¸µé±â");
-		mtOpen = new JButton("¿­±â");
-		mtSave = new JButton("ÀúÀå");
-		mtSaveAs = new JButton("´Ù¸¥ ÀÌ¸§À¸·Î ÀúÀå");
-		mtMakeJava = new JButton(".java ÆÄÀÏ »ı¼º");
-		mtExit = new JButton("´İ±â");
+		mtNew = new JButton("ìƒˆë¡œ ë§Œë“¤ê¸°");
+		mtOpen = new JButton("ì—´ê¸°");
+		mtSave = new JButton("ì €ì¥");
+		mtSaveAs = new JButton("ë‹¤ë¥¸ ì´ë¦„ìœ¼ë¡œ ì €ì¥");
+		mtMakeJava = new JButton(".java íŒŒì¼ ìƒì„±");
+		mtExit = new JButton("ë‹«ê¸°");
 
 		tb.setSize(this.getWidth(), 30);
 
@@ -146,11 +146,11 @@ public class Editor extends JFrame
 		attPane.setSize(this.getWidth() / 3, this.getHeight());
 		attPane.setLocation(0, 10);
 
-		xyPos = new JLabel("½ÃÀÛ x,y ÁÂÇ¥   :");
-		w_h = new JLabel("    ³Êºñ, ³ôÀÌ   :");
-		attValue = new JLabel("ÄÄÆ÷³ÍÆ®ÀÇ ÅØ½ºÆ® ¼Ó¼º°ª   :");
-		comType = new JLabel("  ÄÄÆ÷³ÍÆ® Å¸ÀÔ  :");
-		varName = new JLabel(" ÄÄÆ÷³ÍÆ® º¯¼ö¸í   :");
+		xyPos = new JLabel("ì‹œì‘ x,y ì¢Œí‘œ   :");
+		w_h = new JLabel("    ë„ˆë¹„, ë†’ì´   :");
+		attValue = new JLabel("ì»´í¬ë„ŒíŠ¸ì˜ í…ìŠ¤íŠ¸ ì†ì„±ê°’   :");
+		comType = new JLabel("  ì»´í¬ë„ŒíŠ¸ íƒ€ì…  :");
+		varName = new JLabel(" ì»´í¬ë„ŒíŠ¸ ë³€ìˆ˜ëª…   :");
 
 		tfXYPos = new JTextField();
 		tfW_H = new JTextField();
@@ -166,8 +166,8 @@ public class Editor extends JFrame
 
 		cbComType = new JComboBox(types);
 
-		bChange = new JButton("º¯°æ");
-		bDelete = new JButton("»èÁ¦");
+		bChange = new JButton("ë³€ê²½");
+		bDelete = new JButton("ì‚­ì œ");
 
 		xyPos.setSize(LB_WIDTH, LB_HEIGHT);
 		w_h.setSize(LB_WIDTH, LB_HEIGHT);
@@ -249,8 +249,8 @@ public class Editor extends JFrame
 	}
 	private void mySetFont()
 	{
-		Font f = new Font("¸¼Àº °íµñ", Font.PLAIN, 13);
-		Font f2 = new Font("¸¼Àº °íµñ", Font.BOLD, 13);
+		Font f = new Font("ë§‘ì€ ê³ ë”•", Font.PLAIN, 13);
+		Font f2 = new Font("ë§‘ì€ ê³ ë”•", Font.BOLD, 13);
 
 		mFile.setFont(f);
 		mtNew.setFont(f);
@@ -310,6 +310,7 @@ public class Editor extends JFrame
 		private int onX, onY, offX, offY, beforeX, beforeY;
 		private boolean isSelected, isSized;
 		private int xCk = 0, yCk = 0;
+		private MyModel selectedMyModel;
 		public void mousePressed(MouseEvent e) {
 			onX = e.getX();
 			onY = e.getY();
@@ -336,26 +337,53 @@ public class Editor extends JFrame
 						yCk = -1;
 					}
 				}
-				if(!selected.equals(editPane))
+				if(!selected.equals(editPane)){
 					selected.setBackground(Color.LIGHT_GRAY);
+					tfXYPos.setText("");
+					tfW_H.setText("");
+					tfAttValue.setText("");
+					tfVarName.setText("");
+					cbComType.setSelectedItem("");
+				}
 			}
 			selected = editPane.searchPanel(onX,onY);
 
 			if(!selected.equals(editPane)){
 				selected.setBackground(Color.blue);
-				tfXYPos.setText(selected.getX() + "," + selected.getY());
+				int i = myModelList.find(selected.getX(), selected.getY());
+				selectedMyModel = myModelList.get(i);
+				tfXYPos.setText(selectedMyModel.getX() + "," + selected.getY());
 				tfW_H.setText(selected.getWidth() + "," + selected.getHeight());
+				System.out.println(selectedMyModel.getAttValue());
+				if(selectedMyModel.getAttValue()!=null)
+					tfAttValue.setText(selectedMyModel.getAttValue());
+				else
+					tfAttValue.setText("");
+				if(selectedMyModel.getVarName()!=null)
+					tfVarName.setText(selectedMyModel.getVarName());
+				else
+					tfVarName.setText("");
+				if(selectedMyModel.getComType()!=null)
+					cbComType.setSelectedItem(selectedMyModel.getComType());
+				else
+					cbComType.setSelectedItem("JPanel");
+				selectedMyModel=null;
 				beforeX=onX; beforeY=onY;
 				isSelected=true;
 			}
 			else{
+				tfXYPos.setText("");
+				tfW_H.setText("");
+				tfAttValue.setText("");
+				tfVarName.setText("");
+				cbComType.setSelectedItem("");
 				isSelected=false;
 			}
 		}
 		public void mouseReleased(MouseEvent e) {
 			offX = e.getX();
 			offY = e.getY();
-			if(isSelected){ //¿Å±â±â & Å©±âº¯°æ
+			if(isSelected){ //ì˜®ê¸°ê¸° & í¬ê¸°ë³€ê²½
 				if(!isSized)
 					selected = editPane.searchPanel(offX, offY);
 				if(!selected.equals(editPane)){
@@ -368,7 +396,7 @@ public class Editor extends JFrame
 				beforeX=selected.getX()+selected.getWidth()/2;
 				beforeY=selected.getY()+selected.getHeight()/2;
 			}
-			else{ //Ã³À½ ±×·ÁÁú ¶§
+			else{ //ì²˜ìŒ ê·¸ë ¤ì§ˆ ë•Œ
 				if(offX-onX>0 && offY-onY>0){
 					editPane.removePanel(onX, onY);
 					JPanel panel = editPane.addPanel(onX,onY, offX - onX, offY - onY,Color.LIGHT_GRAY);
@@ -428,22 +456,27 @@ public class Editor extends JFrame
 		int removeX, removeY;
 		public void actionPerformed(ActionEvent e) {
 			String command = e.getActionCommand();
-			if(command.equals("»èÁ¦")) {
+			if(command.equals("ì‚­ì œ")) {
 				myModelList.remove(selected.getX(), selected.getY());
 				if(myModelList.isEmpty())
 					System.out.println("this is empty.");
 				editPane.removePanel(selected.getX(),selected.getY());
 				editPane.repaint();
 			}
-			else if(command.equals("º¯°æ")) {
+			else if(command.equals("ë³€ê²½")) {
 				String attValue = tfAttValue.getText();
 				String varName = tfVarName.getText();
 				String comType = (String) cbComType.getSelectedItem();
+				int index = myModelList.find(selected.getX(), selected.getY());
+				MyModel tmp = myModelList.get(index);
+				tmp.setAttValue(attValue);
+				tmp.setComType(comType);
+				tmp.setVarName(varName);
 			}
 		}
 	}
 	
-	class MyJSON extends JSONObject {
+/*	class MyJSON extends JSONObject {
 		String fileName;
 		JSONObject jObj = new JSONObject();
 		Iterator<MyModel> it = myModelList.iterator();
@@ -469,7 +502,7 @@ public class Editor extends JFrame
 					jObj.put("comType", tmp.getComType() + "");
 				}
 				else {
-					System.out.println("Àß¸øµÈ ÀúÀåÀÔ´Ï´Ù.");
+					System.out.println("ì˜ëª»ëœ ì €ì¥ì…ë‹ˆë‹¤.");
 					return;
 				}	
 			}
@@ -482,8 +515,9 @@ public class Editor extends JFrame
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 }
+
 class MyHandler implements ActionListener
 {
 	String fileName;
@@ -495,34 +529,34 @@ class MyHandler implements ActionListener
 	{
 		String command = e.getActionCommand();
 
-		if (command.equals("»õ·Î ¸¸µé±â"))
+		if (command.equals("ìƒˆë¡œ ë§Œë“¤ê¸°"))
 		{
 			Container newPane = editor.getEditPane();
 			newPane.removeAll();
 			newPane.repaint();
 		}
-		else if (command.equals("¿­±â"))
+		else if (command.equals("ì—´ê¸°"))
 		{
 			System.exit(0);
 		}
-		else if (command.equals("ÀúÀå"))
+		else if (command.equals("ì €ì¥"))
 		{
-			editor.new MyJSON().makeFile();
+			//editor.new MyJSON().makeFile();
 		}
-		else if (command.equals("´Ù¸¥ ÀÌ¸§À¸·Î ÀúÀå"))
+		else if (command.equals("ë‹¤ë¥¸ ì´ë¦„ìœ¼ë¡œ ì €ì¥"))
 		{
 			FileDialog fileSave =
-					new FileDialog(editor, "ÆÄÀÏÀúÀå", FileDialog.SAVE);
+					new FileDialog(editor, "íŒŒì¼ì €ì¥", FileDialog.SAVE);
 			fileSave.setVisible(true);
 			fileName = fileSave.getDirectory() + fileSave.getFile();
-			editor.new MyJSON(fileName).makeFile();
+		//	editor.new MyJSON(fileName).makeFile();
 			System.out.println(fileName);
 		}
-		else if (command.equals(".java ÆÄÀÏ »ı¼º"))
+		else if (command.equals(".java íŒŒì¼ ìƒì„±"))
 		{
 			System.exit(0);
 		}
-		else if (command.equals("´İ±â"))
+		else if (command.equals("ë‹«ê¸°"))
 		{
 			System.exit(0);
 		}
@@ -560,15 +594,19 @@ class MyModel
 }
 
 class MyArrayList extends ArrayList<MyModel>{
-	public boolean remove(int x,int y){
+	public int find(int x,int y){
 		int i;
 		for(i=0; i<this.size(); i++){
 			MyModel tmp = this.get(i);
 			if(tmp.getX()==x && tmp.getY() == y)
-				break;
+				return i;
 
 		}
-		if(i==this.size())
+		return -1;
+	}
+	public boolean remove(int x,int y){
+		int i = this.find(x,y);
+		if(i==-1)
 			return false;
 		else{
 			this.remove(i);
