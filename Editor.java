@@ -464,6 +464,16 @@ public class Editor extends JFrame
 				
 				MyModel changeModel = myModelList.find(selected.getX(), selected.getY());
 				changeAttributes(changeModel);
+				
+				changePos = tfXYPos.getText();
+				changeSize = tfW_H.getText();
+				String pos[] = changePos.split(",");
+				String size[] = changeSize.split(",");
+				changeX = Integer.parseInt(pos[0]);
+				changeY = Integer.parseInt(pos[1]);
+				changeWidth = Integer.parseInt(size[0]);
+				changeHeight = Integer.parseInt(size[1]);
+				
 				if(changeX != selected.getX() || changeY != selected.getY() || changeWidth != selected.getWidth() || changeHeight != selected.getHeight()) {
 					editPane.removePanel(selected.getX(),selected.getY());
 					editPane.repaint();
@@ -489,25 +499,22 @@ public class Editor extends JFrame
 			String attValue = tfAttValue.getText();
 			String varName = tfVarName.getText();
 			String comType = (String) cbComType.getSelectedItem();
-			changeModel.setAttValue(attValue);
-			changeModel.setComType(comType);
-			changeModel.setVarName(varName);
-			changePos = tfXYPos.getText();
-			changeSize = tfW_H.getText();
-			String pos[] = changePos.split(",");
-			String size[] = changeSize.split(",");
-			changeX = Integer.parseInt(pos[0]);
-			changeY = Integer.parseInt(pos[1]);
-			changeWidth = Integer.parseInt(size[0]);
-			changeHeight = Integer.parseInt(size[1]);
+			try {
+				changeModel.setAttValue(attValue);
+				changeModel.setComType(comType);
+				changeModel.setVarName(varName);
+			} catch (Exception e) {
+				return;
+			}
+			
 		}
 		
 		public void redraw(int x, int y, int width, int height, MyModel changeModel) {
 			editPane.addPanel(x, y, width, height, Color.LIGHT_GRAY);
-			changeModel.setX(changeX);
-			changeModel.setY(changeY);
-			changeModel.setWidth(changeWidth);
-			changeModel.setHeight(changeHeight);
+			changeModel.setX(x);
+			changeModel.setY(y);
+			changeModel.setWidth(width);
+			changeModel.setHeight(height);
 		}
 	}
 	
