@@ -25,6 +25,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
+import org.json.simple.JSONObject;
+
 //import org.json.simple.JSONObject;
 
 public class Editor extends JFrame
@@ -81,12 +83,12 @@ public class Editor extends JFrame
 	{
 		mb = new MenuBar();
 		mFile = new Menu("Menu");
-		miNew = new MenuItem("ÏÉàÎ°ú ÎßåÎì§Í∏∞");
-		miOpen = new MenuItem("Ïó¥Í∏∞");
-		miSave = new MenuItem("Ï†ÄÏû•");
-		miSaveAs = new MenuItem("Îã§Î•∏ Ïù¥Î¶ÑÏúºÎ°ú Ï†ÄÏû•");
-		miMakeJava = new MenuItem(".java ÌååÏùº ÏÉùÏÑ±");
-		miExit = new MenuItem("Îã´Í∏∞");
+		miNew = new MenuItem("ªı∑Œ ∏∏µÈ±‚");
+		miOpen = new MenuItem("ø≠±‚");
+		miSave = new MenuItem("¿˙¿Â");
+		miSaveAs = new MenuItem("¥Ÿ∏• ¿Ã∏ß¿∏∑Œ ¿˙¿Â");
+		miMakeJava = new MenuItem(".java ∆ƒ¿œ ª˝º∫");
+		miExit = new MenuItem("¥›±‚");
 
 		mFile.add(miNew);
 		mFile.add(miOpen);
@@ -109,12 +111,12 @@ public class Editor extends JFrame
 		final int B2 = 159;
 
 		tb = new JToolBar();
-		mtNew = new JButton("ÏÉàÎ°ú ÎßåÎì§Í∏∞");
-		mtOpen = new JButton("Ïó¥Í∏∞");
-		mtSave = new JButton("Ï†ÄÏû•");
-		mtSaveAs = new JButton("Îã§Î•∏ Ïù¥Î¶ÑÏúºÎ°ú Ï†ÄÏû•");
-		mtMakeJava = new JButton(".java ÌååÏùº ÏÉùÏÑ±");
-		mtExit = new JButton("Îã´Í∏∞");
+		mtNew = new JButton("ªı∑Œ ∏∏µÈ±‚");
+		mtOpen = new JButton("ø≠±‚");
+		mtSave = new JButton("¿˙¿Â");
+		mtSaveAs = new JButton("¥Ÿ∏• ¿Ã∏ß¿∏∑Œ ¿˙¿Â");
+		mtMakeJava = new JButton(".java ∆ƒ¿œ ª˝º∫");
+		mtExit = new JButton("¥›±‚");
 
 		tb.setSize(this.getWidth(), 30);
 
@@ -146,11 +148,11 @@ public class Editor extends JFrame
 		attPane.setSize(this.getWidth() / 3, this.getHeight());
 		attPane.setLocation(0, 10);
 
-		xyPos = new JLabel("ÏãúÏûë x,y Ï¢åÌëú   :");
-		w_h = new JLabel("    ÎÑàÎπÑ, ÎÜíÏù¥   :");
-		attValue = new JLabel("Ïª¥Ìè¨ÎÑåÌä∏Ïùò ÌÖçÏä§Ìä∏ ÏÜçÏÑ±Í∞í   :");
-		comType = new JLabel("  Ïª¥Ìè¨ÎÑåÌä∏ ÌÉÄÏûÖ  :");
-		varName = new JLabel(" Ïª¥Ìè¨ÎÑåÌä∏ Î≥ÄÏàòÎ™Ö   :");
+		xyPos = new JLabel("Ω√¿€ x,y ¡¬«•   :");
+		w_h = new JLabel("    ≥ ∫Ò, ≥Ù¿Ã   :");
+		attValue = new JLabel("ƒƒ∆˜≥Õ∆Æ¿« ≈ÿΩ∫∆Æ º”º∫∞™   :");
+		comType = new JLabel("  ƒƒ∆˜≥Õ∆Æ ≈∏¿‘  :");
+		varName = new JLabel(" ƒƒ∆˜≥Õ∆Æ ∫Øºˆ∏Ì   :");
 
 		tfXYPos = new JTextField();
 		tfW_H = new JTextField();
@@ -166,8 +168,8 @@ public class Editor extends JFrame
 
 		cbComType = new JComboBox(types);
 
-		bChange = new JButton("Î≥ÄÍ≤Ω");
-		bDelete = new JButton("ÏÇ≠Ï†ú");
+		bChange = new JButton("∫Ø∞Ê");
+		bDelete = new JButton("ªË¡¶");
 
 		xyPos.setSize(LB_WIDTH, LB_HEIGHT);
 		w_h.setSize(LB_WIDTH, LB_HEIGHT);
@@ -249,8 +251,8 @@ public class Editor extends JFrame
 	}
 	private void mySetFont()
 	{
-		Font f = new Font("ÎßëÏùÄ Í≥†Îîï", Font.PLAIN, 13);
-		Font f2 = new Font("ÎßëÏùÄ Í≥†Îîï", Font.BOLD, 13);
+		Font f = new Font("∏º¿∫ ∞ÌµÒ", Font.PLAIN, 13);
+		Font f2 = new Font("∏º¿∫ ∞ÌµÒ", Font.BOLD, 13);
 
 		mFile.setFont(f);
 		mtNew.setFont(f);
@@ -383,7 +385,7 @@ public class Editor extends JFrame
 		public void mouseReleased(MouseEvent e) {
 			offX = e.getX();
 			offY = e.getY();
-			if(isSelected){ //ÏòÆÍ∏∞Í∏∞ & ÌÅ¨Í∏∞Î≥ÄÍ≤Ω
+			if(isSelected){ //ø≈±‚±‚ & ≈©±‚∫Ø∞Ê
 				if(!isSized)
 					selected = editPane.searchPanel(offX, offY);
 				if(!selected.equals(editPane)){
@@ -396,7 +398,7 @@ public class Editor extends JFrame
 				beforeX=selected.getX()+selected.getWidth()/2;
 				beforeY=selected.getY()+selected.getHeight()/2;
 			}
-			else{ //Ï≤òÏùå Í∑∏Î†§Ïßà Îïå
+			else{ //√≥¿Ω ±◊∑¡¡˙ ∂ß
 				if(offX-onX>0 && offY-onY>0){
 					editPane.removePanel(onX, onY);
 					JPanel panel = editPane.addPanel(onX,onY, offX - onX, offY - onY,Color.LIGHT_GRAY);
@@ -453,17 +455,19 @@ public class Editor extends JFrame
 	}
 	class MyButtonListener implements ActionListener {
 		JPanel removePanel;
+		String changePos, changeSize;
+		int changeX, changeY, changeWidth, changeHeight;
 		int removeX, removeY;
 		public void actionPerformed(ActionEvent e) {
 			String command = e.getActionCommand();
-			if(command.equals("ÏÇ≠Ï†ú")) {
+			if(command.equals("ªË¡¶")) {
 				myModelList.remove(selected.getX(), selected.getY());
 				if(myModelList.isEmpty())
 					System.out.println("this is empty.");
 				editPane.removePanel(selected.getX(),selected.getY());
 				editPane.repaint();
 			}
-			else if(command.equals("Î≥ÄÍ≤Ω")) {
+			else if(command.equals("∫Ø∞Ê")) {
 				String attValue = tfAttValue.getText();
 				String varName = tfVarName.getText();
 				String comType = (String) cbComType.getSelectedItem();
@@ -472,11 +476,32 @@ public class Editor extends JFrame
 				tmp.setAttValue(attValue);
 				tmp.setComType(comType);
 				tmp.setVarName(varName);
+				changePos = tfXYPos.getText();
+				changeSize = tfW_H.getText();
+				String pos[] = changePos.split(",");
+				String size[] = changeSize.split(",");
+				changeX = Integer.parseInt(pos[0]);
+				changeY = Integer.parseInt(pos[1]);
+				changeWidth = Integer.parseInt(size[0]);
+				changeHeight = Integer.parseInt(size[1]);
+				if(changeX != selected.getX() || changeY != selected.getY() || changeWidth != selected.getWidth() || changeHeight != selected.getHeight()) {
+					editPane.removePanel(selected.getX(),selected.getY());
+					editPane.repaint();
+					redraw(changeX, changeY, changeWidth, changeHeight);
+					editPane.repaint();
+					tmp.setX(changeX);
+					tmp.setY(changeY);
+					tmp.setWidth(changeWidth);
+					tmp.setHeight(changeHeight);
+				}
 			}
+		}
+		public void redraw(int x, int y, int width, int height) {
+			editPane.addPanel(x, y, width, height, Color.LIGHT_GRAY);
 		}
 	}
 	
-/*	class MyJSON extends JSONObject {
+	class MyJSON extends JSONObject {
 		String fileName;
 		JSONObject jObj = new JSONObject();
 		Iterator<MyModel> it = myModelList.iterator();
@@ -500,9 +525,10 @@ public class Editor extends JFrame
 					jObj.put("attValue", tmp.getAttValue() + "");
 					jObj.put("varName", tmp.getVarName() + "");
 					jObj.put("comType", tmp.getComType() + "");
+					System.out.println("Created JSON FILE" + jObj);
 				}
 				else {
-					System.out.println("ÏûòÎ™ªÎêú Ï†ÄÏû•ÏûÖÎãàÎã§.");
+					System.out.println("¿ﬂ∏¯µ» ¿˙¿Â¿‘¥œ¥Ÿ.");
 					return;
 				}	
 			}
@@ -515,13 +541,17 @@ public class Editor extends JFrame
 				e.printStackTrace();
 			}
 		}
-	}*/
+	}
+	public MyArrayList getMyModelList() {
+		return myModelList;
+	}
 }
 
 class MyHandler implements ActionListener
 {
 	String fileName;
 	Editor editor;
+	ArrayList<MyModel> list;
 	public MyHandler(Editor editor) {
 		this.editor = editor;
 	}
@@ -529,34 +559,36 @@ class MyHandler implements ActionListener
 	{
 		String command = e.getActionCommand();
 
-		if (command.equals("ÏÉàÎ°ú ÎßåÎì§Í∏∞"))
+		if (command.equals("ªı∑Œ ∏∏µÈ±‚"))
 		{
 			Container newPane = editor.getEditPane();
 			newPane.removeAll();
 			newPane.repaint();
+			MyArrayList del = editor.getMyModelList();
+			del.clear();
 		}
-		else if (command.equals("Ïó¥Í∏∞"))
+		else if (command.equals("ø≠±‚"))
 		{
 			System.exit(0);
 		}
-		else if (command.equals("Ï†ÄÏû•"))
+		else if (command.equals("¿˙¿Â"))
 		{
-			//editor.new MyJSON().makeFile();
+			editor.new MyJSON().makeFile();
 		}
-		else if (command.equals("Îã§Î•∏ Ïù¥Î¶ÑÏúºÎ°ú Ï†ÄÏû•"))
+		else if (command.equals("¥Ÿ∏• ¿Ã∏ß¿∏∑Œ ¿˙¿Â"))
 		{
 			FileDialog fileSave =
-					new FileDialog(editor, "ÌååÏùºÏ†ÄÏû•", FileDialog.SAVE);
+					new FileDialog(editor, "∆ƒ¿œ¿˙¿Â", FileDialog.SAVE);
 			fileSave.setVisible(true);
 			fileName = fileSave.getDirectory() + fileSave.getFile();
-		//	editor.new MyJSON(fileName).makeFile();
+			editor.new MyJSON(fileName).makeFile();
 			System.out.println(fileName);
 		}
-		else if (command.equals(".java ÌååÏùº ÏÉùÏÑ±"))
+		else if (command.equals(".java ∆ƒ¿œ ª˝º∫"))
 		{
 			System.exit(0);
 		}
-		else if (command.equals("Îã´Í∏∞"))
+		else if (command.equals("¥›±‚"))
 		{
 			System.exit(0);
 		}
@@ -585,6 +617,10 @@ class MyModel
 	public int getY(){ return y; }
 	public int getWidth(){ return width; }
 	public int getHeight() {return height;}
+	public void setX(int x) {this.x = x;}
+	public void setY(int y) {this.y = y;}
+	public void setWidth(int width) {this.width = width;}
+	public void setHeight(int height) {this.height = height;}
 	public void setAttValue(String attValue) {this.attValue = attValue;}
 	public void setVarName(String varName) {this.varName = varName;}
 	public void setComType(String comType) {this.comType = comType;}
