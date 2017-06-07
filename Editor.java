@@ -548,14 +548,12 @@ public class Editor extends JFrame
 		
 	}
 	public JTextField getTextField(String c) {
-		switch(c) {
-			case "XYPos":
+		if(c.equals("XYPos")) {
 				return tfXYPos;
-			case "W_H":
+		} else if(c.equals("W_H")) {
 				return tfW_H;
-			default:
-				return null;
-		}
+		} else 
+			return null;
 	}
 	public MyArrayList getMyModelList() {
 		return myModelList;
