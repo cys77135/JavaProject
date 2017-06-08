@@ -530,7 +530,7 @@ public class Editor extends JFrame
 		JSONArray jModelList = new JSONArray();
 		Iterator<MyModel> it = myModelList.iterator();
 		public MyJSON() {
-			fileName = "d:\\MyJSON.json";	
+			fileName = ".\\MyJSON.json";	
 		}
 		
 		public MyJSON(String fileName) {
@@ -540,7 +540,7 @@ public class Editor extends JFrame
 		public void makeJSONFile() {
 				while(it.hasNext()) {
 					MyModel tmp = (MyModel)it.next();
-					if(tmp.getAttValue() != null && tmp.getVarName() != null && tmp.getComType() != null) {
+					try {
 						JSONArray jModelList = new JSONArray();
 						jModelList.add(tmp.getX() + "");
 						jModelList.add(tmp.getY() + "");
@@ -551,9 +551,10 @@ public class Editor extends JFrame
 						jModelList.add(tmp.getComType());
 						jObj.put(jModelIndex + "¹øÂ° ¸ðµ¨", jModelList);
 						jModelIndex++;
-					}
-					else
+					} catch(Exception e) {
+						jModelIndex = 1;
 						return;
+					}
 				}
 				
 			try {
@@ -667,6 +668,7 @@ class MyHandler implements ActionListener
                			jModelIndex++;
                		}
                	} catch (Exception e) {
+               		jModelIndex = 1;
                		return;
                	}
             	   
