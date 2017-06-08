@@ -552,10 +552,10 @@ public class Editor extends JFrame {
                 MyModel tmp = it.next();
                 if (tmp.getAttValue() != null && tmp.getVarName() != null && tmp.getComType() != null) {
                     JSONArray jModelList = new JSONArray();
-                    jModelList.add(tmp.getX() + "");
-                    jModelList.add(tmp.getY() + "");
-                    jModelList.add(tmp.getWidth() + "");
-                    jModelList.add(tmp.getHeight() + "");
+                    jModelList.add(tmp.getX());
+                    jModelList.add(tmp.getY());
+                    jModelList.add(tmp.getWidth());
+                    jModelList.add(tmp.getHeight());
                     jModelList.add(tmp.getAttValue());
                     jModelList.add(tmp.getVarName());
                     jModelList.add(tmp.getComType());
@@ -622,12 +622,13 @@ class MyHandler implements ActionListener {
             newPane.repaint();
             myModelList = editor.getMyModelList();
             myModelList.clear();
-            try {
+           
             FileDialog fileOpen =
                     new FileDialog(editor, "파일열기", FileDialog.LOAD);
             fileOpen.setVisible(true);
             fileName = fileOpen.getDirectory() + fileOpen.getFile();
             System.out.println(fileName);
+            try {
             fileOpen(fileName);
             } catch (Exception ex) {
             	return;
@@ -666,20 +667,17 @@ class MyHandler implements ActionListener {
         int jModelIndex = 1;
         try {
             // myJson.json파일을 읽어와 Object로 파싱
-            Object obj = parser.parse(new FileReader(fileName));
-
-            JSONObject jObject = (JSONObject) obj;
-
-            try {
+        		Object obj = parser.parse(new FileReader(fileName));
+        		JSONObject jObject = (JSONObject) obj;	
+            
                 while (true) {
                     JSONArray jModelList = (JSONArray) jObject.get(jModelIndex + "번째 모델");
                     Iterator<String> it = jModelList.iterator();
-                    while (it.hasNext())
-                    {
-                        int x = Integer.parseInt(it.next());
-                        int y = Integer.parseInt(it.next());
-                        int width = Integer.parseInt(it.next());
-                        int height = Integer.parseInt(it.next());
+                    while (it.hasNext()) {
+                        int x = Integer.parseInt((String)it.next() + "");
+                        int y = Integer.parseInt((String)it.next() + "");
+                        int width = Integer.parseInt((String)it.next() + "");
+                        int height = Integer.parseInt((String)it.next() + "");
                         String attValue = it.next();
                         String varName = it.next();
                         String comType = it.next();
@@ -688,12 +686,8 @@ class MyHandler implements ActionListener {
                     jModelIndex++;
                 }
             }
-            catch (Exception e) {
-                return;
-            }
-        }
         catch (Exception e) {
-            e.printStackTrace();
+        	return;
         }
     }
 
@@ -756,7 +750,7 @@ class MyHandler implements ActionListener {
                     "}");
             bw.close();
             fw.close();
-            System.out.println("sample.txt 파일이 성공적으로 생성되었습니다.");
+            System.out.println(".java 파일이 성공적으로 생성되었습니다.");
         }
         catch (Exception e) { }
     }
