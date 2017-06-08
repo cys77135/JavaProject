@@ -590,11 +590,13 @@ class MyHandler implements ActionListener
 	String fileName;
 	Editor editor;
 	ArrayList<MyModel> myModelList;
+	boolean isOpened = false;
 	public MyHandler(Editor editor) {
 		this.editor = editor;
 	}
 	public void actionPerformed(ActionEvent e)
 	{
+		
 		String command = e.getActionCommand();
 
 		if (command.equals("새로 만들기"))
@@ -612,25 +614,39 @@ class MyHandler implements ActionListener
 			newPane.repaint();
 			myModelList = editor.getMyModelList();
 			myModelList.clear();
-			FileDialog fileOpen =
+			isOpened = true;
+			try {
+				FileDialog fileOpen =
 					new FileDialog(editor, "파일열기", FileDialog.LOAD);
-			fileOpen.setVisible(true);
-			fileName = fileOpen.getDirectory() + fileOpen.getFile();
-			System.out.println(fileName);
-			fileOpen(fileName);
+				fileOpen.setVisible(true);
+				fileName = fileOpen.getDirectory() + fileOpen.getFile();
+				System.out.println(fileName);
+				fileOpen(fileName);
+			} catch (Exception ex) {
+				return;
+			}
 		}
 		else if (command.equals("저장"))
 		{
-			editor.new MyJSON().makeJSONFile();
+			if(isOpened == false) {
+				editor.new MyJSON().makeJSONFile();
+			} else {
+				editor.new MyJSON(fileName).makeJSONFile();
+				isOpened = false;
+			}
 		}
 		else if (command.equals("다른 이름으로 저장"))
 		{
+			try {
 			FileDialog fileSave =
 					new FileDialog(editor, "파일저장", FileDialog.SAVE);
 			fileSave.setVisible(true);
 			fileName = fileSave.getDirectory() + fileSave.getFile();
 			editor.new MyJSON(fileName).makeJSONFile();
 			System.out.println(fileName);
+			} catch(Exception ex) {
+				return;
+			}
 		}
 		else if (command.equals(".java 파일 생성"))
 		{
@@ -647,7 +663,8 @@ class MyHandler implements ActionListener
 		int jModelIndex = 1;
         try {
                // myJson.json파일을 읽어와 Object로 파싱
-               Object obj = parser.parse(new FileReader(fileName));
+        		try {
+        			Object obj = parser.parse(new FileReader(fileName));
                
                JSONObject jObject =(JSONObject) obj;
                
@@ -664,13 +681,13 @@ class MyHandler implements ActionListener
                				String varName = it.next();
                				String comType = it.next();
                				openedFilePaint(x, y, width, height, attValue, varName, comType);
-            	   		}
-               			jModelIndex++;
+            	   			}
+               				jModelIndex++;
+               			}
+               		} 	catch (Exception e) {
+               			return;
                		}
-               	} catch (Exception e) {
-               		jModelIndex = 1;
-               		return;
-               	}
+        		} catch(Exception ex) { return; }
             	   
         } catch (Exception e) {
                e.printStackTrace();
