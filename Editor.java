@@ -552,10 +552,10 @@ public class Editor extends JFrame {
                 MyModel tmp = it.next();
                 if (tmp.getAttValue() != null && tmp.getVarName() != null && tmp.getComType() != null) {
                     JSONArray jModelList = new JSONArray();
-                    jModelList.add(tmp.getX());
-                    jModelList.add(tmp.getY());
-                    jModelList.add(tmp.getWidth());
-                    jModelList.add(tmp.getHeight());
+                    jModelList.add(tmp.getX() + "");
+                    jModelList.add(tmp.getY() + "");
+                    jModelList.add(tmp.getWidth() + "");
+                    jModelList.add(tmp.getHeight() + "");
                     jModelList.add(tmp.getAttValue());
                     jModelList.add(tmp.getVarName());
                     jModelList.add(tmp.getComType());
@@ -674,10 +674,10 @@ class MyHandler implements ActionListener {
                     JSONArray jModelList = (JSONArray) jObject.get(jModelIndex + "¹øÂ° ¸ðµ¨");
                     Iterator<String> it = jModelList.iterator();
                     while (it.hasNext()) {
-                        int x = Integer.parseInt((String)it.next() + "");
-                        int y = Integer.parseInt((String)it.next() + "");
-                        int width = Integer.parseInt((String)it.next() + "");
-                        int height = Integer.parseInt((String)it.next() + "");
+                        int x = Integer.parseInt(it.next());
+                        int y = Integer.parseInt(it.next());
+                        int width = Integer.parseInt(it.next());
+                        int height = Integer.parseInt(it.next());
                         String attValue = it.next();
                         String varName = it.next();
                         String comType = it.next();
