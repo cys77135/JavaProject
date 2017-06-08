@@ -503,6 +503,7 @@ public class Editor extends JFrame
 				changeModel.setAttValue(attValue);
 				changeModel.setComType(comType);
 				changeModel.setVarName(varName);
+				cbComType.setSelectedItem(comType);
 			} catch (Exception e) {
 				return;
 			}
@@ -518,6 +519,10 @@ public class Editor extends JFrame
 		}
 	}
 	
+	public JComboBox getComboBox() {
+		return cbComType;
+	}
+	
 	class MyJSON extends JSONObject {
 		String fileName;
 		JSONObject jObj = new JSONObject();
@@ -525,7 +530,7 @@ public class Editor extends JFrame
 		JSONArray jModelList = new JSONArray();
 		Iterator<MyModel> it = myModelList.iterator();
 		public MyJSON() {
-			fileName = "c:\\MyJSON.json";	
+			fileName = "d:\\MyJSON.json";	
 		}
 		
 		public MyJSON(String fileName) {
@@ -675,6 +680,7 @@ class MyHandler implements ActionListener
 		MyModel newMyModel = new MyModel(x, y, width, height, attValue, varName, comType);
 		JTextField tfXYPos = editor.getTextField("XYPos");
 		JTextField tfW_H = editor.getTextField("W_H");
+		JComboBox cbComType = editor.getComboBox();
 		JPanel newPanel = new JPanel();
 		
 		myModelList = editor.getMyModelList();
@@ -684,6 +690,7 @@ class MyHandler implements ActionListener
 		newPanel.setLocation(x,y);
 		tfXYPos.setText(x + "," + y);
 		tfW_H.setText(width + "," + height);
+		cbComType.setSelectedItem(comType);
 		editPane.add(newPanel);
 		editPane.repaint();
 		
