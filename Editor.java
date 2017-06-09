@@ -721,7 +721,7 @@ class MyHandler implements ActionListener {
         ArrayList<MyModel> list = editor.getMyModelList();
         Iterator<MyModel> it = list.iterator();
         try {
-            fw = new FileWriter(".\\Test.java");
+            fw = new FileWriter(".\\My GUI.java");
             bw = new BufferedWriter(fw);
             bw.write("import javax.swing.*;\n" + "import java.awt.*;\n");
             bw.write("\n" + "public class Test extends JFrame\n{\n");
@@ -737,6 +737,7 @@ class MyHandler implements ActionListener {
                     "\n");
             while(it.hasNext()) {
                 MyModel tmp = it.next();
+                if(tmp.getComType() != null && tmp.getVarName() != null && tmp.getAttValue() != null) {
                 bw.write("        " + tmp.getComType() + " " + tmp.getVarName()
                         + " = new " + tmp.getComType() + "();\n");
                 bw.write("        " + tmp.getVarName() + ".setBounds("
@@ -745,18 +746,21 @@ class MyHandler implements ActionListener {
                 bw.write("        " + tmp.getVarName() + ".setBackground(Color.LIGHT_GRAY);\n");
                 bw.write("        " + tmp.getVarName() + ".setText(\"" + tmp.getAttValue() + "\");\n");
                 bw.write("        add(" + tmp.getVarName() + ");\n");
-            }
-            bw.write("        repaint();\n");
-            bw.write("    }\n" +
-                    "\n" +
-                    "    public static void main(String[] args)\n" +
-                    "    {\n" +
-                    "        new Test();\n" +
-                    "    }\n" +
-                    "}");
-            bw.close();
-            fw.close();
-            System.out.println(".java 파일이 성공적으로 생성되었습니다.");
+                bw.write("        repaint();\n");
+                bw.write("    }\n" +
+                        "\n" +
+                        "    public static void main(String[] args)\n" +
+                        "    {\n" +
+                        "        new Test();\n" +
+                        "    }\n" +
+                        "}");
+                bw.close();
+                fw.close();
+                System.out.println(".java 파일이 성공적으로 생성되었습니다.");
+                }
+                else
+                	System.out.println(".java 파일을 생성할 수 없습니다.");
+            }            
         }
         catch (Exception e) { }
     }
