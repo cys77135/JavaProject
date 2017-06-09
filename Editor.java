@@ -540,10 +540,14 @@ public class Editor extends JFrame {
 
         public MyJSON(String fileName) {
             try {
-            	String tmp[] = fileName.split(".");
-            	this.fileName = tmp[0] + ".json";
+            	if(fileName != null) {
+            		String tmp[] = fileName.split(".");
+            		this.fileName = tmp[0] + ".json";
+            	}
             } catch (Exception e) {
-            	this.fileName = fileName + ".json";
+            	if(fileName != null) {
+            		this.fileName = fileName + ".json";
+            	}
             }
         }
 
@@ -691,7 +695,7 @@ class MyHandler implements ActionListener {
         }
     }
 
-    public void openedFilePaint(int x, int y, int width, int height, String attValue, String varName, String comType) {
+    public void openedFilePaint (int x, int y, int width, int height, String attValue, String varName, String comType) {
         Container editPane = editor.getEditPane();
         MyModel newMyModel = new MyModel(x, y, width, height, attValue, varName, comType);
         JTextField tfXYPos = editor.getTextField("XYPos");
@@ -714,6 +718,8 @@ class MyHandler implements ActionListener {
     public void javaFile() throws IOException {
         FileWriter fw;
         BufferedWriter bw;
+        ArrayList<MyModel> list = editor.getMyModelList();
+        Iterator<MyModel> it = list.iterator();
         try {
             fw = new FileWriter(".\\Test.java");
             bw = new BufferedWriter(fw);
@@ -729,8 +735,8 @@ class MyHandler implements ActionListener {
                     "        setSize(1000, 1000);\n" +
                     "        setVisible(true);\n" +
                     "\n");
-            for (int i = 0; i < editor.getMyModelList().size(); i++) {
-                MyModel tmp = myModelList.get(i);
+            while(it.hasNext()) {
+                MyModel tmp = it.next();
                 bw.write("        " + tmp.getComType() + " " + tmp.getVarName()
                         + " = new " + tmp.getComType() + "();\n");
                 bw.write("        " + tmp.getVarName() + ".setBounds("
