@@ -473,6 +473,10 @@ public class Editor extends JFrame {
             		changeSize = tfWidth_Height.getText();
             		String pos[] = changePos.split(",");
             		String size[] = changeSize.split(",");
+            		pos[0] = pos[0].trim();
+            		pos[1] = pos[1].trim();
+            		size[0] = size[0].trim();
+            		size[1] = size[1].trim();
             		changeX = Integer.parseInt(pos[0]);
             		changeY = Integer.parseInt(pos[1]);
             		changeWidth = Integer.parseInt(size[0]);
@@ -552,7 +556,7 @@ public class Editor extends JFrame {
             }
         }
 
-        public void makeJSONFile() {
+        public void createJSONFile() {
             while (it.hasNext()) {
                 MyModel sourceModel = it.next();
                 if (sourceModel.getAttributeValue() != null && sourceModel.getVariableName() != null && sourceModel.getComponentType() != null) {
@@ -580,7 +584,7 @@ public class Editor extends JFrame {
             catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("Created JSON Object" + jObj);
+            
         }
     }
 
@@ -632,7 +636,7 @@ class MyHandler implements ActionListener {
                     new FileDialog(editor, "Open File", FileDialog.LOAD);
             fileOpen.setVisible(true);
             fileName = fileOpen.getDirectory() + fileOpen.getFile();
-            System.out.println(fileName);
+            
             try {
             fileOpen(fileName);
             } catch (Exception ex) {
@@ -640,7 +644,7 @@ class MyHandler implements ActionListener {
             }
         }
         else if (command.equals("Save")) {
-            editor.new MyJSON().makeJSONFile();
+            editor.new MyJSON().createJSONFile();
         }
         else if (command.equals("Save As")) {
         	try {
@@ -648,8 +652,8 @@ class MyHandler implements ActionListener {
                     new FileDialog(editor, "Save File", FileDialog.SAVE);
             fileSave.setVisible(true);
             fileName = fileSave.getDirectory() + fileSave.getFile();
-            editor.new MyJSON(fileName).makeJSONFile();
-            System.out.println(fileName);
+            editor.new MyJSON(fileName).createJSONFile();
+            
             } catch (Exception ex) {
             	return;
             }
