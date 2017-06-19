@@ -385,8 +385,6 @@ public class Editor extends JFrame {
 			offX = e.getX();
 			offY = e.getY();
 			if (isSelected) { //옮기기 & 크기변경
-				if (!isSized)
-					selected = editPane.searchPanel(offX, offY);
 				if (!selected.equals(editPane)) {
 					selected.setBackground(Color.blue);
 				}
